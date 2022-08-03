@@ -9,6 +9,7 @@ module kb_genetree {
     ** Common types
     */
     typedef string workspace_name;
+    typedef int    workspace_id;
     typedef string data_obj_ref;
     typedef string data_obj_name;
     typedef int    bool;
@@ -29,6 +30,7 @@ module kb_genetree {
     */
     typedef structure {
         workspace_name  workspace_name;
+        workspace_id    workspace_id;
         data_obj_ref    input_genetree_ref;
         string          genome_disp_name_config;
     } GeneTreeGenomeContext_Input;

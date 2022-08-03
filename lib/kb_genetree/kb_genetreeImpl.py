@@ -94,7 +94,8 @@ class kb_genetree:
 
         # INIT VARS
         KBase_backend = True
-        using_kbase_filesystem = True
+        KBase_filesystem = True
+        Display_plot = False
         Hide_controls = True
         genome_data_format = "KBase"
         #GenomeSet_ref = '16750/58/1'  # SAGs
@@ -113,6 +114,8 @@ class kb_genetree:
         tree_data_file = None
         PrimaryAnchor_leafId = None
         PrimaryAnchor_locusTag = None
+
+        self.log(console,"GOT TO A")  # DEBUG
 
         # RUN KGB
         #%pylab notebook
@@ -212,6 +215,8 @@ class kb_genetree:
         # INIT
         ###############################################################################
 
+        self.log(console,"GOT TO B")  # DEBUG
+
         # Init independent of KBase_backend
         #
         #import numpy as np # comes with pylabfeatures
@@ -242,13 +247,16 @@ class kb_genetree:
         #from ipywidgets import interact
         #import ipywidgets as widgets
 
+        self.log(console,"GOT TO C")  # DEBUG
 
         # Extra Init for KBase
         #
         if KBase_backend:
 
+            print ("USING KBASE_BACKEND")  # DEBUG
+            
             # output directory
-            if using_kbase_filesystem:
+            if KBase_filesystem:
                 timestamp = int((datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds() * 1000)
                 output_dir = os.path.join(self.shared_folder, 'output_' + str(timestamp))
                 if not os.path.exists(output_dir):
@@ -462,6 +470,8 @@ class kb_genetree:
         Global_Domains = dict()
 
 
+        self.log(console,"GOT TO D")  # DEBUG
+        
         # Build or append to GenomeSet_names
         #
         if KBase_backend:
@@ -497,6 +507,8 @@ class kb_genetree:
                     GenomeSet_refs.append(genome_ref)
                     #GenomeSet_names[genome_ref] = genome_ref  # FIX
                     #print (genome_id+" "+genome_ref)
+
+                self.log(console,"GOT TO E")  # DEBUG
 
             # or use FeatureSet to build GenomeSet
             #
@@ -731,6 +743,7 @@ class kb_genetree:
                         "genomebrowser_color_namespace":     def_genomebrowser_color_namespace
                        }
 
+        self.log(console,"GOT TO F")  # DEBUG
 
         # Set up canvas and arrow config
         #
@@ -4020,7 +4033,8 @@ class kb_genetree:
                 # Draw Tree with ETE3
                 if GeneTree_ref:
                     tree_img_path = os.path.join (output_dir, GeneTree_obj_name+'.png')
-                    newick_string = GeneTree_data['tree']
+                    newick_string = geneTree_data['tree']
+                    self.log(console, "LOADED NEWICK")  # DEBUG
                 else:
                     tree_img_path = path.join('.','tree.png')
                     newick_string = ''
@@ -4030,12 +4044,15 @@ class kb_genetree:
                     with open (tree_path, 'r') as tree_file_handle:
                         for tree_line in tree_file_handle:
                             newick_string += tree_line
+                    self.log(console,"LOADED NEWICK")  # DEBUG
 
                 # ETE3 customization
                 import ete3
+                self.log(console,"INSTANTIATE TREE")  # DEBUG
                 treeObj = ete3.Tree(newick_string)
                 #treeObj.ladderize()  # read row order from leaves?
                 ts = ete3.TreeStyle()
+                self.log(console,"SET TREE STYLE")  # DEBUG
                 #ts.show_leaf_name = True
                 ts.show_leaf_name = False
                 ts.show_branch_length = False
@@ -4062,6 +4079,8 @@ class kb_genetree:
                 leaf_style["hz_line_width"] = 4
                 leaf_style["vt_line_type"] = 0 # 0 solid, 1 dashed, 2 dotted
                 leaf_style["hz_line_type"] = 0
+
+                self.log(console,"TRAVERSING TREE")  # DEBUG
                 for n in treeObj.traverse():
                     if n.is_leaf():
                         style = leaf_style
@@ -4091,19 +4110,24 @@ class kb_genetree:
                 img_in_width = round(float(img_pix_width)/float(dpi), 1)
                 #img_in_height = img_in_width * total_rows / 5.0
                 #treeObj.render(tree_img_path, w=img_in_width, h=img_in_height, units=img_units, dpi=dpi, tree_style=ts)
+                self.log(console,"SAVING TREE IMAGE")  # DEBUG
                 treeObj.render(tree_img_path, w=img_in_width, units=img_units, dpi=dpi, tree_style=ts)
+                self.log(console,"TREE IMAGE SAVED")  # DEBUG
 
                 # load and display tree
                 from matplotlib.offsetbox import (OffsetImage, AnnotationBbox)
                 xy = [0.5, 0.51]
-                arr_img = plt.imread(tree_img_path, format='png')
+                arr_img = pyplot.imread(tree_img_path, format='png')
                 #ax.imshow(arr_img)
+                self.log(console,"PLOT LOADED TREE")  # DEBUG
 
                 imagebox = OffsetImage(arr_img, zoom=1.0)
                 imagebox.image.axes = ax
+                self.log(console,"AXES SET")  # DEBUG
 
                 ab = AnnotationBbox(imagebox, xy, frameon=False)
                 ax.add_artist(ab)
+                self.log(console,"IMAGE BOX ADDED TO AXES")  # DEBUG
 
 
             # Line representation
@@ -4564,7 +4588,8 @@ class kb_genetree:
                              Global_State['ContigSet_names'][0], \
                              Global_State['genomebrowser_mode'], \
                              Global_State['Dataset_names_list'][0])    
-            pyplot.show()
+            if Display_plot:
+                pyplot.show()
 
         def update_control_panel (ax):
             ax.cla()
@@ -4572,13 +4597,15 @@ class kb_genetree:
                                 Global_State['genomebrowser_zoom'], \
                                 Global_State['genomebrowser_xshift'], \
                                 Global_State['genomebrowser_color_namespace'])    
-            pyplot.show()
+            if Display_plot:
+                pyplot.show()
 
         def update_sidenav_panel (ax):
             ax.cla()
             draw_sidenav_panel (ax, \
                                 Global_State['genomebrowser_mode'])
-            pyplot.show()
+            if Display_plot:
+                pyplot.show()
 
         def update_genomebrowser_panel (ax):
 
@@ -4605,6 +4632,8 @@ class kb_genetree:
             feature_artist_label_to_popup_box = {}
             Global_State['popup_zorder'] = def_popup_zorder
 
+            self.log(console, "GOT TO G.1")  # DEBUG
+
             # Add Genome tracks
             #
             draw_genomebrowser_panel (ax, \
@@ -4613,7 +4642,10 @@ class kb_genetree:
                                       genomebrowser_window_bp_width = Global_State['genomebrowser_window_bp_width'], \
                                       genomebrowser_xshift = Global_State['genomebrowser_xshift'], \
                                       genomebrowser_mode = Global_State['genomebrowser_mode'])
-            pyplot.show()
+            self.log(console, "GOT TO G.2")  # DEBUG
+            if Display_plot:
+                pyplot.show()
+            self.log(console, "GOT TO G.3")  # DEBUG
 
 
         ###############################################################################                
@@ -4662,6 +4694,7 @@ class kb_genetree:
 
         # Draw genome browser panel (must happen first to load Global_State)
         #
+        self.log(console,"GOT TO G")  # DEBUG
         feature_artist_label_to_feature = {}     # these need to be global (kludge)
         feature_artist_label_to_popup_box = {}   # these need to be global (kludge)
         pos_knob_patch = None                    # these need to be global (kludge)
@@ -4670,8 +4703,10 @@ class kb_genetree:
 
         # Draw sidenav (tree, circles, etc.)
         #
+        self.log(console,"GOT TO H")  # DEBUG
         update_sidenav_panel (ax_left)
 
+        self.log(console,"GOT TO I")  # DEBUG
 
         # Draw mode panel
         #
@@ -4692,7 +4727,7 @@ class kb_genetree:
         #
         self.log(console, "SAVING REPORT IMAGES")
         img_dpi = 200
-        #plt.show()
+        #pyplot.show()
         self.log(console, "SAVING IMAGE")
         out_file_basename = GeneTree_obj_name+'-genome_context'
         png_file = out_file_basename+'.png'
