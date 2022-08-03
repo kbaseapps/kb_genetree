@@ -60,9 +60,9 @@ class kb_genetreeTest(unittest.TestCase):
 
     #### Gene Tree Genome Context
     ##
-    @unittest.skip("skipped test_01_run_genetree_genome_context()")  # uncomment to skip
+    # HIDE @unittest.skip("skipped test_01_run_genetree_genome_context()")  # uncomment to skip
     def test_01_run_genetree_genome_context(self):
-        method = 'run_01_genetree_genome_context'
+        method = '01_run_genetree_genome_context'
 
         print ("\n\nRUNNING: test_"+method)
         print ("==================================================\n\n")
