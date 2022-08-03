@@ -1,7 +1,7 @@
 #
 # define display information
 #
-name: View Gene Tree Genome Context
+name: View Gene Tree Genome Context - v0.0.1
 
 tooltip: |
     View the neighborhood around each gene in a gene tree, like a Tree Browser

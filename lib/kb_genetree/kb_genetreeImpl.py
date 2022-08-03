@@ -84,6 +84,14 @@ class kb_genetree:
         self.log(console, "\n" + pformat(params))
 
 
+        required_params = ['workspace_name',
+                           'input_genetree_ref'
+                           ]
+        for arg in required_params:
+            if arg not in params or params[arg] == None or params[arg] == '':
+                raise ValueError("Must define required param: '" + arg + "'")
+        
+
         # INIT VARS
         KBase_backend = True
         using_kbase_filesystem = True
@@ -93,8 +101,9 @@ class kb_genetree:
         #GenomeSet_ref = '16750/39/3'  # Firmicutes
         GenomeSet_ref = None
         #FeatureSet_ref = '16750/62/1'
-        FeatureSet_ref = '16750/63/1'  # rpoB Firmicutes
-        #FeatureSet_ref = None
+        #FeatureSet_ref = '16750/63/1'  # rpoB Firmicutes
+        FeatureSet_ref = None
+        GeneTree_ref = params['input_genetree_ref']
         Search_Terms = []
         domain_data_exists = True
         domain_data_format = "KBase_domains"
@@ -156,7 +165,7 @@ class kb_genetree:
         domain_family_desc_base_path = None
 
         tree_data_format = 'newick'
-        # if relative path to tree is e.g.: ../data_example/NCBI_annot/trees/rpoB_tree-names.newick
+        # if relative path to tree is e.g.: ../data_example/NCBI_annot/trees/rpoB_tree-names.newickfeaturesetOA
         tree_data_base_path = './data_example/NCBI_annot/trees'
         tree_data_file = 'rpoB_tree-names.newick'
 
@@ -251,6 +260,9 @@ class kb_genetree:
             # silence whining
             import requests
             requests.packages.urllib3.disable_warnings()
+
+            # special char
+            genome_ref_feature_id_delim = '.f:'
 
             # object_info tuple   
             [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I,
@@ -393,6 +405,7 @@ class kb_genetree:
                     if not feature.get('id'):
                         raise ValueError ("missing id field for feature index="+str(f_i)+" in genome "+genome_obj['info'][NAME_I])
                     fid = feature['id']
+                    #print ("FID: '"+fid+"'")  # DEBUG
                     if feature_id_list and fid not in feature_id_list:
                         continue
                     features[fid] = feature
@@ -456,9 +469,38 @@ class kb_genetree:
             GenomeSet_refs = []
             GenomeSet_names = dict()
 
-            # Use FeatureSet to build GenomeSet
+            # Use GeneTree to build GenomeSet
             #
-            if FeatureSet_ref != None:
+            if GeneTree_ref != None:
+                try:
+                    geneTree_obj = ws.get_objects([{'ref':GeneTree_ref}])
+                    geneTree_data = geneTree_obj[0]['data']
+                    geneTree_info = geneTree_obj[0]['info']
+
+                except Exception as e:
+                    raise ValueError('Unable to fetch geneTree object from workspace: ' + str(e))
+                    #to get the full stack trace: traceback.format_exc()
+
+                GeneTree_obj_name = geneTree_info[NAME_I]
+
+                # build PivotFeatures and GenomeSet_Refs
+                def hex2ascii(matchobj):
+                    hex_val = matchobj.group(0).lstrip('%')
+                    return bytearray.fromhex(hex_val).decode()
+
+                for leaf_id in geneTree_data['leaf_list']:
+                    leaf_id = re.sub (r'%[\da-f][\da-f]', hex2ascii, leaf_id)
+                    #print ("LEAF_ID: '"+leaf_id+"'")  # DEBUG
+                    [genome_ref, f_id] = leaf_id.split(genome_ref_feature_id_delim)
+                    f_id = re.sub (r'^kb\;', 'kb|', f_id)
+                    PivotFeatures_IDs.append(f_id)
+                    GenomeSet_refs.append(genome_ref)
+                    #GenomeSet_names[genome_ref] = genome_ref  # FIX
+                    #print (genome_id+" "+genome_ref)
+
+            # or use FeatureSet to build GenomeSet
+            #
+            elif FeatureSet_ref is not None:
                 try:
                     featureSet_obj = ws.get_objects([{'ref':FeatureSet_ref}])
                     featureSet_data = featureSet_obj[0]['data']
@@ -506,10 +548,10 @@ class kb_genetree:
                         #GenomeSet_names[genome_ref] = genome_id
                         #print (genome_id+" "+genome_ref)
 
-            # Need either FeatureSet_ref or GenomeSet_ref
+            # Need GeneTree_ref, FeatureSet_ref, or GenomeSet_ref
             #
             else:
-                raise ValueError ("KGB: FeatureSet_ref or GenomeSet_ref is required")
+                raise ValueError ("KGB: GeneTree_ref, FeatureSet_ref, or GenomeSet_ref is required")
 
 
         # Instantiate GenomeAnnotationAPI and Build GenomeSet_names
@@ -551,20 +593,23 @@ class kb_genetree:
         if KBase_backend:
             for genome_i,genome_ref in enumerate(GenomeSet_refs):
                 genome_obj = Global_KBase_Genomes[genome_ref]
-                if not FeatureSet_ref and not GeneTree_ref:
+                if FeatureSet_ref is None and GeneTree_ref is None:
                     for scaffold_id in gaAPI_get_contig_ids(genome_obj=genome_obj):            
                         contig_name = genome_ref+genome_contig_id_delim+scaffold_id
                         ContigSet_names.append(contig_name)
                         Genome_ref_by_Contig_name[contig_name] = genome_ref
-                elif FeatureSet_ref:
+                elif GeneTree_ref is not None or FeatureSet_ref is not None:
                     fid = PivotFeatures_IDs[genome_i]
+                    #print ("THIS FID: '"+fid+"'")  # DEBUG
                     these_pivot_features = gaAPI_get_features(genome_obj=genome_obj, feature_id_list=[fid])
+                    # HERE
+                    #print ("THESE_PIVOT_FEATURES: '"+pformat(these_pivot_features)+"'")  # DEBUG
                     scaffold_id = these_pivot_features[fid]['location'][0][KB_LOC_CTG_I]
                     contig_name = genome_ref+genome_contig_id_delim+scaffold_id
                     ContigSet_names.append(contig_name)
                     Genome_ref_by_Contig_name[contig_name] = genome_ref
                 else:
-                    raise ValueError ("GeneTree only input not supported at this time")
+                    raise ValueError ("unknown target set type in Build ContigSet_names")
 
         elif genome_data_format == "Genbank":
             for genome_id in GenomeSet_names:
@@ -610,7 +655,7 @@ class kb_genetree:
             mode_names_disp.append('Homologs')
             mode_names.append('homologs')
             def_genomebrowser_mode = "homologs"
-        if tree_data_file:
+        if tree_data_file or GeneTree_ref:
             mode_names_disp.append('Tree')
             mode_names.append('tree')
             def_genomebrowser_mode = "tree"
@@ -3973,17 +4018,21 @@ class kb_genetree:
                 """
 
                 # Draw Tree with ETE3
-                import ete3
-                newick_string = ''
-                tree_path = path.join(tree_data_base_path,tree_data_file)
-                tree_img_path = path.join('.','tree.png')
-                #tree_img_path = path.join('.','tree.pdf')  # can't put pdf into plot
-                #with open (tree_path, 'r', 0) as tree_file_handle:   # can't have unbuffered text I/O
-                with open (tree_path, 'r') as tree_file_handle:
-                    for tree_line in tree_file_handle:
-                        newick_string += tree_line
+                if GeneTree_ref:
+                    tree_img_path = os.path.join (output_dir, GeneTree_obj_name+'.png')
+                    newick_string = GeneTree_data['tree']
+                else:
+                    tree_img_path = path.join('.','tree.png')
+                    newick_string = ''
+                    tree_path = path.join(tree_data_base_path,tree_data_file)
+                    #tree_img_path = path.join('.','tree.pdf')  # can't put pdf into plot
+                    #with open (tree_path, 'r', 0) as tree_file_handle:   # can't have unbuffered text I/O
+                    with open (tree_path, 'r') as tree_file_handle:
+                        for tree_line in tree_file_handle:
+                            newick_string += tree_line
 
                 # ETE3 customization
+                import ete3
                 treeObj = ete3.Tree(newick_string)
                 #treeObj.ladderize()  # read row order from leaves?
                 ts = ete3.TreeStyle()
@@ -4645,7 +4694,7 @@ class kb_genetree:
         img_dpi = 200
         #plt.show()
         self.log(console, "SAVING IMAGE")
-        out_file_basename = 'genetree_genome_context'
+        out_file_basename = GeneTree_obj_name+'-genome_context'
         png_file = out_file_basename+'.png'
         pdf_file = out_file_basename+'.pdf'
         output_png_file_path = os.path.join(html_dir, png_file);
@@ -4697,7 +4746,7 @@ class kb_genetree:
         # Create report obj
         #
         self.log(console, "BUILDING REPORT OBJECT")
-        reportName = 'genetree_genome_context_report_' + str(uuid.uuid4())
+        reportName = GeneTree_obj_name+'-genome_context_report_' + str(uuid.uuid4())
         #report += output_newick_buf+"\n"
         reportObj = {'objects_created': [],
                      'direct_html_link_index': 0,
@@ -4708,16 +4757,16 @@ class kb_genetree:
                      }
         reportObj['html_links'] = [{'shock_id': html_upload_ret['shock_id'],
                                     'name': html_file,
-                                    'label': 'genetree genome context' + ' HTML'
+                                    'label': GeneTree_obj_name+' genome context' + ' HTML'
                                     }
                                    ]        
         reportObj['file_links'].extend([{'shock_id': png_upload_ret['shock_id'],
-                                         'name': 'genetree_genome_context' + '.png',
-                                         'label': 'genetree_genome_context' + ' PNG'
+                                         'name': GeneTree_obj_name+'-genome_context' + '.png',
+                                         'label': GeneTree_obj_name+' genome context' + ' PNG'
                                          },
                                         {'shock_id': pdf_upload_ret['shock_id'],
-                                         'name': 'genetree_genome_context' + '.pdf',
-                                         'label': 'genetree_genome_context' + ' PDF'
+                                         'name': GeneTree_obj_name+'-genome_context' + '.pdf',
+                                         'label': GeneTree_obj_name+' genome context' + ' PDF'
                                          }])        
 
         reportClient = KBaseReport(self.callback_url, token=ctx['token'])
