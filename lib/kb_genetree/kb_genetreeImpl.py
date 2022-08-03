@@ -24,7 +24,7 @@ class kb_genetree:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "https://github.com/kbaseapps/kb_genetree"
-    GIT_COMMIT_HASH = "3eaeec4994ed1b72d586deeea57ddbc569a31601"
+    GIT_COMMIT_HASH = "fda774f8b63f9d53307a95a0ea0359039e8e5230"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER

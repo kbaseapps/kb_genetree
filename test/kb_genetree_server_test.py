@@ -52,16 +52,31 @@ class kb_genetreeTest(unittest.TestCase):
             cls.wsClient.delete_workspace({'workspace': cls.wsName})
             print('Test workspace was deleted')
 
-    # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
-    def test_your_method(self):
-        # Prepare test objects in workspace if needed using
-        # self.getWsClient().save_objects({'workspace': self.getWsName(),
-        #                                  'objects': []})
-        #
-        # Run your method by
-        # ret = self.getImpl().your_method(self.getContext(), parameters...)
-        #
-        # Check returned data with
-        # self.assertEqual(ret[...], ...) or other unittest methods
-        ret = self.serviceImpl.run_kb_genetree(self.ctx, {'workspace_name': self.wsName,
-                                                             'parameter_1': 'Hello World!'})
+
+    ##############
+    # UNIT TESTS #
+    ##############
+
+
+    #### Gene Tree Genome Context
+    ##
+    @unittest.skip("skipped test_01_run_genetree_genome_context()")  # uncomment to skip
+    def test_01_run_genetree_genome_context(self):
+        method = 'run_01_genetree_genome_context'
+
+        print ("\n\nRUNNING: test_"+method)
+        print ("==================================================\n\n")
+
+        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
+        
+        debug_workspace_name = 'dylan:1471889662419'
+        debug_workspace_id = 16750
+        debug_genetree_ref = '16750/78/1'
+        
+        ret = self.serviceImpl.run_genetree_genome_context (self.ctx,
+                     #{'workspace_name': self.wsName,
+                     {'workspace_name': debug_workspace_name,
+                      'input_genetree_ref': debug_genetree_ref
+                     }
+                    )
+        print ("DONE")
