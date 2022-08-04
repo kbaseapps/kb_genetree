@@ -14,7 +14,6 @@ import uuid
 from datetime import datetime
 from pprint import pformat,pprint
 from installed_clients.KBaseReportClient import KBaseReport
-from installed_clients.DataFileUtilClient import DataFileUtil as DFUClient
 #END_HEADER
 
 
@@ -254,6 +253,9 @@ class kb_genetree:
         if KBase_backend:
 
             print ("USING KBASE_BACKEND")  # DEBUG
+
+            # KBase-specific library
+            from installed_clients.DataFileUtilClient import DataFileUtil as DFUClient
             
             # output directory
             if KBase_filesystem:
@@ -415,7 +417,7 @@ class kb_genetree:
                 if (not os.path.exists(json_features_file_path) \
                     or os.path.getsize(json_features_file_path) == 0):
                     try:
-                        dfu = DataFileUtil (self.callback_url)
+                        dfu = DFUClient (self.callback_url)
                     except Exception as e:
                         raise ValueError('Unable to connect to DFU: ' + str(e))
                     try:
