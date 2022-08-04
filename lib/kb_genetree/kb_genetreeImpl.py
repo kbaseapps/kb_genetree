@@ -1023,7 +1023,7 @@ class kb_genetree:
 
         # KBase feature structure
         #
-        def build_feature_rec_kbase (f, f_type='CDS', source_species='', contig_i=0, dna_seq=None):
+        def build_feature_rec_kbase (f, f_type='CDS', source_species='', contig_i=0, dna_seq='N'):
             feature_rec = {}
 
             id_delim = '.'
@@ -1745,7 +1745,10 @@ class kb_genetree:
 
                         for fid in features.keys():
                             f_type = features[fid]['type']
-                            dna_seq = features[fid]['dna_sequence']
+                            if features[fid].get('dna_sequence'):
+                                dna_seq = features[fid]['dna_sequence']
+                            else:
+                                dna_seq = 'N'  # DEBUG
                             feature_rec = build_feature_rec_kbase(features[fid], f_type=f_type, source_species=source, contig_i=i, dna_seq=dna_seq)
                             Feature_slice.append(feature_rec)                        
 
@@ -1973,7 +1976,10 @@ class kb_genetree:
 
                         for fid in features.keys():
                             f_type = features[fid]['type']
-                            dna_seq = features[fid]['dna_sequence']
+                            if features[fid].get('dna_sequence'):
+                                dna_seq = features[fid]['dna_sequence']
+                            else:
+                                dna_seq = 'N'  # DEBUG
                             feature_rec = build_feature_rec_kbase(features[fid], f_type=f_type, source_species=source, contig_i=i, dna_seq=dna_seq)
                             Feature_slice.append(feature_rec)                        
 
