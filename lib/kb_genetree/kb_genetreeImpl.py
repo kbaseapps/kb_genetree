@@ -1046,6 +1046,9 @@ class kb_genetree:
                         if locus_tag == f['id'] and 'IPR' not in alias[0]:
                             locus_tag = alias[0]  # fix this to match regexp \D+_?\d+ (but not IPR*), and stop assignment
                         aliases.append(alias)
+                    elif isinstance(alias,list):
+                        aliases.append(alias)
+                        
                     else:
                         raise ValueError ("unknown alias type "+str(alias))
 
@@ -1357,7 +1360,12 @@ class kb_genetree:
                     if k == 'aliases':
                         try:
                             for f in feature_rec[k]:
-                                info_uc_list.append(f[k].upper())
+                                if isinstance(f,str):
+                                    info_uc_list.append(f.upper())
+                                elif isinstance(f,tuple):
+                                    info_uc_list.append(f[0].upper())
+                                elif isinstance(f,list):
+                                    info_uc_list.append(f[1].upper())
                         except:
                             continue                
                     else:
