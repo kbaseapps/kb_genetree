@@ -341,7 +341,8 @@ class kb_genetree:
                 genome_obj_data = genome_obj['data']
                 genome_obj_info = genome_obj['info']
                 if not genome_obj_data.get('scientific_name') \
-                    or genome_obj_data['scientific_name'].lower() == 'unknown':
+                    or genome_obj_data['scientific_name'].lower() == 'unknown' \
+                    or genome_obj_data['scientific_name'].lower() == 'unknown_taxon':
                     scientific_name = genome_obj_info[NAME_I]
                 else:
                     scientific_name = genome_obj_data['scientific_name']    
@@ -370,12 +371,10 @@ class kb_genetree:
 
                 """
                 feature_ids = dict()  # key is ctg_id
-                genome_obj_data = genome_obj['data']
                 [KB_LOC_CTG_I, KB_LOC_BEG_I, KB_LOC_STRAND_I, KB_LOC_LEN_I] = range(4)      
+                all_features = gaAPI_get_all_features(genome_obj)
 
-                if not genome_obj_data.get('features'):
-                    raise ValueError ("missing features field for genome "+genome_obj['info'][NAME_I])
-                for f_i, feature in enumerate(genome_obj_data['features']):
+                for f_i, feature in enumerate(all_features):
                     if not feature.get('id'):
                         raise ValueError ("missing id field for feature index="+str(f_i)+" in genome "+genome_obj['info'][NAME_I])
                     fid = feature['id']
@@ -403,13 +402,53 @@ class kb_genetree:
                 return feature_ids    
 
 
+            # get all features for genome
+            def gaAPI_get_all_genome_features (genome_obj_data=None):
+                if not genome_obj_data.get('features'):
+                    raise ValueError ("missing features field for genome "+genome_obj['info'][NAME_I])
+                return genome_obj_data['features']
+
+
+            # get all features for AMA
+            def gaAPI_get_all_AMA_features (features_handle_ref=None):
+                json_features_file_path = os.path.join (output_dir, features_handle_ref+".json")
+                if (not os.path.exists(json_features_file_path) \
+                    or os.path.getsize(json_features_file_path) == 0):
+                    try:
+                        dfu = DataFileUtil (self.callback_url)
+                    except Exception as e:
+                        raise ValueError('Unable to connect to DFU: ' + str(e))
+                    try:
+                        dfu.shock_to_file({'handle_id': features_handle_ref,
+                                           'file_path': json_features_file_path+'.gz',
+                                           'unpack': 'uncompress'
+                           })
+                    except Exception as e:
+                        raise ValueError('Unable to fetch AnnotatedMetagenomeAssembly features from SHOCK: ' + str(e))                    
+
+                # read file into json structure
+                with open(json_features_file_path, 'r') as f:
+                    features_json = json.load(f)
+                return features_json
+
+            def gaAPI_get_all_features (genome_obj=None):
+                # AMA
+                if genome_obj['info'][TYPE_I].startswith("KBaseMetagenomes.AnnotatedMetagenomeAssembly"):
+                    features_handle_ref = genome_obj['data']['features_handle_ref']
+                    all_features = gaAPI_get_all_AMA_features(features_handle_ref)
+                # Genome
+                else: 
+                    all_features = gaAPI_get_all_genome_features(genome_obj['data'])
+
+                return all_features
+                    
             # replacement method for GenomeAnnotationAPI ga.get_features()
             def gaAPI_get_features (genome_obj=None, feature_array_type='CDS', feature_id_list=None):
                 features = dict()  # key is feature id
-                genome_obj_data = genome_obj['data']
-                if not genome_obj_data.get('features'):
-                    raise ValueError ("missing features field for genome "+genome_obj['info'][NAME_I])
-                for f_i, feature in enumerate(genome_obj_data['features']):
+                all_features = gaAPI_get_all_features (genome_obj)
+
+                # capture just those feature IDs requested
+                for f_i, feature in enumerate(all_features):
                     if not feature.get('id'):
                         raise ValueError ("missing id field for feature index="+str(f_i)+" in genome "+genome_obj['info'][NAME_I])
                     fid = feature['id']
@@ -421,19 +460,60 @@ class kb_genetree:
                         features[fid]['type'] = feature_array_type
                 return features    
 
+            # get contig ids from features, for when not available in parent obj
+            def gaAPI_get_contig_ids_from_features (genome_obj=None):
+                contig_ids_dict = dict()
+                all_features = gaAPI_get_all_features (genome_obj)
+                for f_i, feature in enumerate(all_features):                
+                    ctg_id = feature['location'][0][KB_LOC_CTG_I]
+                    contig_ids_dict[ctg_id] = True
+                return sorted(contig_ids_dict.keys())
+            
+            # get contig lens from features, for when not available in parent obj
+            def gaAPI_get_contig_lens_from_features (genome_obj=None):
+                contig_lens_dict = dict()
+                all_features = gaAPI_get_all_features (genome_obj)
+                for f_i, feature in enumerate(all_features):                
+                    ctg_id = feature['location'][0][KB_LOC_CTG_I]
+                    strand = feature['location'][0][KB_LOC_STRAND_I]
+                    if strand == '+':
+                        beg = feature['location'][0][KB_LOC_BEG_I]
+                        end = beg + feature['location'][0][KB_LOC_LEN_I] - 1
+                    else:
+                        beg = feature['location'][0][KB_LOC_BEG_I]
+                        end = beg - feature['location'][0][KB_LOC_LEN_I] + 1
+                    bigger = end
+                    if beg > end:
+                        bigger = beg
+                    if not contig_lens_dict.get(ctg_id) or bigger > contig_lens_dict[ctg_id]:
+                        contig_lens_dict[ctg_id] = bigger
+                return contig_lens_dict
+            
             # replacement method for GenomeAnnotationAPI ass.get_contig_ids()
             def gaAPI_get_contig_ids (genome_obj=None):
                 genome_obj_data = genome_obj['data']
-                if not genome_obj_data.get('contig_ids'):
-                    raise ValueError("Genome object "+genome_obj['info'][NAME_I]+" missing 'contig_ids'")
-                return genome_obj_data['contig_ids']
+                contig_ids = []
+                if genome_obj_data.get('contig_ids') and len(genome_obj_data['contig_ids']) > 0:
+                    contig_ids = genome_obj_data['contig_ids']
+                else:
+                    #raise ValueError("Genome object "+genome_obj['info'][NAME_I]+" missing 'contig_ids'")
+                    contig_ids = gaAPI_get_contig_ids_from_features(genome_obj)
+                    
+                return contig_ids
 
             # replacement method for GenomeAnnotationAPI ass.get_contig_lengths()
             def gaAPI_get_contig_lengths (genome_obj=None):
                 contig_lengths = dict()
                 genome_obj_data = genome_obj['data']
-                for contig_i,contig_id in enumerate(genome_obj_data['contig_ids']):
-                    contig_lengths[contig_id] = genome_obj_data['contig_lengths'][contig_i]
+                if genome_obj_data.get('contig_ids') \
+                   and len(genome_obj_data['contig_ids']) > 0 \
+                   and genome_obj_data.get('contig_lengths') \
+                   and len(genome_obj_data['contig_lengths']) == len(genome_obj_data['contig_ids']):
+                    for contig_i,contig_id in enumerate(genome_obj_data['contig_ids']):
+                        contig_lengths[contig_id] = genome_obj_data['contig_lengths'][contig_i]
+                else:
+                    contig_lengths = gaAPI_get_contig_lens_from_features (genome_obj)
+
                 return contig_lengths
 
             # replacement method for GenomeAnnotationAPI ass.get_contig_gc_content()
