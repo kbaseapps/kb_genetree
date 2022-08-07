@@ -342,8 +342,9 @@ class kb_genetree:
 
             # replacement method for GenomeAnnotationAPI ga
             def gaAPI_get_genome (genome_ref=None):
+                genome_ref_noVER = '/'.join(genome_ref.split('/')[0:2])
                 try:
-                    genome_obj = ws.get_objects([{'ref':genome_ref}])[0]
+                    genome_obj = ws.get_objects([{'ref':genome_ref_noVER}])[0]
                 except Exception as e:
                     raise ValueError('Unable to fetch genome object '+genome_ref+' from workspace: ' + str(e))
                 return genome_obj
@@ -586,8 +587,9 @@ class kb_genetree:
             # Use GeneTree to build GenomeSet
             #
             if GeneTree_ref != None:
+                GeneTree_ref_noVER = '/'.join(GeneTree_ref.split('/')[0:2])
                 try:
-                    geneTree_obj = ws.get_objects([{'ref':GeneTree_ref}])
+                    geneTree_obj = ws.get_objects([{'ref':GeneTree_ref_noVER}])
                     geneTree_data = geneTree_obj[0]['data']
                     geneTree_info = geneTree_obj[0]['info']
 
@@ -625,8 +627,9 @@ class kb_genetree:
             # or use FeatureSet to build GenomeSet
             #
             elif FeatureSet_ref is not None:
+                FeatureSet_ref_noVER = '/'.join(FeatureSet_ref.split('/')[0:2])
                 try:
-                    featureSet_obj = ws.get_objects([{'ref':FeatureSet_ref}])
+                    featureSet_obj = ws.get_objects([{'ref':FeatureSet_ref_noVER}])
                     featureSet_data = featureSet_obj[0]['data']
                     featureSet_info = featureSet_obj[0]['info']
 
@@ -653,8 +656,9 @@ class kb_genetree:
             # or use GenomeSet
             #
             elif GenomeSet_ref != None:
+                GenomeSet_ref_noVER = '/'.join(GenomeSet_ref.split('/')[0:2])
                 try:
-                    genomeSet_obj = ws.get_objects([{'ref':GenomeSet_ref}])
+                    genomeSet_obj = ws.get_objects([{'ref':GenomeSet_ref_noVER}])
                     genomeSet_data = genomeSet_obj[0]['data']
                     genomeSet_info = genomeSet_obj[0]['info']
 
@@ -3314,6 +3318,7 @@ class kb_genetree:
                 if Global_State['genomebrowser_color_namespace'] == "annot":
 
                     if 'gene_name' in feature and feature['gene_name']:
+                        print ("setting color for gene_name {}".format(feature['gene_name']))  # DEBUG
                         feature_element_color = color_names[sum([ord(c) for c in feature['gene_name']]) % len(color_names)]
 
                     elif 'annot' in feature:
@@ -3341,9 +3346,11 @@ class kb_genetree:
                             most_abundant_fxn = None
                             most_abundant_cnt = 0
                             for fxn in sorted(feature['functions']): # must sort to avoid ties
+                                print ("checking fxn {}".format(fxn))  # DEBUG
                                 if Global_State["function_abundance_counts"][fxn] > most_abundant_cnt:
                                     most_abundant_count = Global_State["function_abundance_counts"][fxn]
                                     most_abundant_fxn = fxn
+                            print ("most abundant fxn {}".format(most_abundant_fxn))  # DEBUG
                             feature_element_color = color_names[sum([ord(c) for c in most_abundant_fxn]) % len(color_names)]
 
                 elif Global_State['genomebrowser_color_namespace'] == "ec":
@@ -4260,6 +4267,9 @@ class kb_genetree:
                     n.set_style(style)
 
                 # write tree to image file
+
+                # this is what I had before
+                """
                 dpi = 600
                 img_units = "in"
                 img_pix_width = 200
@@ -4268,6 +4278,18 @@ class kb_genetree:
                 #treeObj.render(tree_img_path, w=img_in_width, h=img_in_height, units=img_units, dpi=dpi, tree_style=ts)
                 self.log(console,"SAVING TREE IMAGE")  # DEBUG
                 treeObj.render(tree_img_path, w=img_in_width, units=img_units, dpi=dpi, tree_style=ts)
+                """
+
+                # new 
+                dpi = 600
+                img_units = "in"
+                img_pix_width = 200
+                img_in_width = round(float(img_pix_width)/float(dpi), 1)
+                img_in_height = 40 * total_rows
+                self.log(console,"SAVING TREE IMAGE")  # DEBUG
+                treeObj.render(tree_img_path, w=img_in_width, h=img_in_height, units=img_units, dpi=dpi, tree_style=ts)
+                #treeObj.render(tree_img_path, w=img_in_width, units=img_units, dpi=dpi, tree_style=ts)
+
                 self.log(console,"TREE IMAGE SAVED")  # DEBUG
 
                 # load and display tree
