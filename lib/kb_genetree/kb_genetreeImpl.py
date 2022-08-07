@@ -3813,17 +3813,17 @@ class kb_genetree:
                     feature_name_disp = gene_name  # maybe add more options here
                     if len(feature_name_disp) <= max_feature_disp_len:
                     
-                    # old label
-                    feature_label = ax.text(label_start_pos, \
-                                            label_y_pos, \
-                                            feature_name_disp, \
-                                            #row_n, \  # DEBUG
-                                            verticalalignment=vert_align, \
-                                            horizontalalignment="left", \
-                                            transform=ax.transAxes, \
-                                            color=label_color, \
-                                            fontsize=arrow_label_fontsize, \
-                                            zorder=1)
+                        # old label
+                        feature_label = ax.text(label_start_pos, \
+                                                label_y_pos, \
+                                                feature_name_disp, \
+                                                #row_n, \  # DEBUG
+                                                verticalalignment=vert_align, \
+                                                horizontalalignment="left", \
+                                                transform=ax.transAxes, \
+                                                color=label_color, \
+                                                fontsize=arrow_label_fontsize, \
+                                                zorder=1)
 
                 #print (feature['source_species']+" "+feature['name']+" %f %f %f"%(arrow_start_pos, arrow_base_length, y_pos_base))
 
