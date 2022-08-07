@@ -3823,6 +3823,7 @@ class kb_genetree:
                 # new label pos
                 label_start_pos = feature_element_start_pos
                 label_y_pos = y_pos_base
+                print ("ROW: {} y_pos: {}".format(row_n, label_y_pos))
                 label_y_pos += 0.1 * float(row_n) / float(max_row_n)
                 vert_align = "center"   # top,bottom,center,baseline,center_baseline
                 
