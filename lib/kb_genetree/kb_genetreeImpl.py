@@ -248,6 +248,24 @@ class kb_genetree:
 
         self.log(console,"GOT TO C")  # DEBUG
 
+
+        # tree-based row order
+        #
+        def feature_id_order_from_genetree (newick_string):
+            ordered_feature_ids = []
+            
+            import ete3
+            self.log(console,"INSTANTIATE TREE")  # DEBUG
+            treeObj = ete3.Tree(newick_string)
+            treeObj.ladderize()  # read row order from leaves?
+
+            self.log(console,"TRAVERSING TREE")  # DEBUG
+            for n in treeObj.traverse():
+                if n.is_leaf():
+                    ordered_feature_ids.append(n.name)
+
+            return ordered_feature_ids
+        
         # Extra Init for KBase
         #
         if KBase_backend:
@@ -574,6 +592,13 @@ class kb_genetree:
                     #to get the full stack trace: traceback.format_exc()
 
                 GeneTree_obj_name = geneTree_info[NAME_I]
+
+                feature_id_row_order = feature_ids_from_genetree (geneTree_data['tree'])
+                # DEBUG HERE
+                for fid in feature_id_row_order:
+                    self.log(console, "FEATURE_ID_FROM_NEWICK: '{}'".format(fid))
+                for leaf_id in geneTree_data['leaf_list']:
+                    self.log(console, "LEAF_ID_FROM_OBJ: '{}'".format(fid))
 
                 # build PivotFeatures and GenomeSet_Refs
                 def hex2ascii(matchobj):
@@ -4132,7 +4157,6 @@ class kb_genetree:
                 if GeneTree_ref:
                     tree_img_path = os.path.join (output_dir, GeneTree_obj_name+'.png')
                     newick_string = geneTree_data['tree']
-                    self.log(console, "LOADED NEWICK")  # DEBUG
                 else:
                     tree_img_path = path.join('.','tree.png')
                     newick_string = ''
@@ -4142,7 +4166,7 @@ class kb_genetree:
                     with open (tree_path, 'r') as tree_file_handle:
                         for tree_line in tree_file_handle:
                             newick_string += tree_line
-                    self.log(console,"LOADED NEWICK")  # DEBUG
+                self.log(console,"LOADED NEWICK")  # DEBUG
 
                 # ETE3 customization
                 import ete3
