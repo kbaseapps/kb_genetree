@@ -3823,7 +3823,7 @@ class kb_genetree:
                 # new label pos
                 label_start_pos = feature_element_start_pos
                 label_y_pos = y_pos_base
-                label_y_pos += 5*float(row_n) / float(max_row_n)
+                label_y_pos += 40*float(row_n) / float(max_row_n) - 20
                 vert_align = "center"   # top,bottom,center,baseline,center_baseline
                 
 #                if Global_State['genomebrowser_window_bp_width'] > text_disp_window_bp_limit or this_label_show_top:
