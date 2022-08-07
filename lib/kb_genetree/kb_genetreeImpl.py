@@ -3786,8 +3786,13 @@ class kb_genetree:
                     if this_label_show_top == False and this_label_show_bot == False:
                         this_label_show_top = True
 
+
+                        
                 # label position
-                label_y_pos = bottom_margin + (1.0-bottom_margin-top_margin)*row_delta*(total_rows-row_n)
+
+                # old label pos
+                """
+                #label_y_pos = bottom_margin + (1.0-bottom_margin-top_margin)*row_delta*(total_rows-row_n)
 
                 if Global_State['genomebrowser_window_bp_width'] > text_disp_window_bp_limit or this_label_show_top:
                     vert_align = "bottom"
@@ -3803,6 +3808,42 @@ class kb_genetree:
                         label_start_pos += .0050
                     #else:
                     #    label_start_pos += .0005
+                """
+
+                # this is what we drew the arrow with, so use these coords
+                """
+                new_arrow = ax.arrow (feature_element_start_pos, \
+                                  y_pos_base, \
+                                  dir_adj*feature_element_base_length, \
+                                  0.0, \
+                                  width=arrow_w, \
+                                  #color=feature_element_color, \
+                                  #ec=feature_element_edge_color, \
+                                  #lw=feature_element_edge_lw, \
+                                  #alpha=0.75, \
+                                  zorder=1, \
+                                  picker=True, \
+                                  **arrow_params)
+                """
+
+                # new label pos
+                if Global_State['genomebrowser_window_bp_width'] > text_disp_window_bp_limit or this_label_show_top:
+                    vert_align = "bottom"
+                    #label_y_pos = y_pos_base + 0.9*text_yshift
+                    label_y_pos = y_pos_base
+                    if direction == "rev":
+                        label_start_pos += .0015
+                    #else:
+                    #    label_start_pos += .0005
+                else:
+                    vert_align = "top"
+                    #label_y_pos = y_pos_base - 1.25*text_yshift
+                    label_y_pos = y_pos_base
+                    if direction == "rev":
+                        label_start_pos += .0050
+                    #else:
+                    #    label_start_pos += .0005
+
 
                 # draw label
                 if pivot_feature_flag or \
