@@ -801,7 +801,8 @@ class kb_genetree:
             max_rows = def_genome_mode_n_rows
         if def_genome_mode_n_rows%2 == 0:
             def_genome_mode_n_rows += 1
-
+        max_feature_disp_len = 8
+            
         def_popup_zorder = 100
         def_genomebrowser_window_bp_width = 1000
         def_genomebrowser_zoom_tics = 7
@@ -3804,12 +3805,18 @@ class kb_genetree:
                     #    label_start_pos += .0005
 
                 # draw label
-                if pivot_feature_flag or feature_oi_flag or this_label_show_top or this_label_show_bot:
-
+                if pivot_feature_flag or \
+                   feature_oi_flag or \
+                   this_label_show_top or \
+                   this_label_show_bot:
+                    
+                    feature_name_disp = gene_name  # maybe add more options here
+                    if len(feature_name_disp) <= max_feature_disp_len:
+                    
                     # old label
                     feature_label = ax.text(label_start_pos, \
                                             label_y_pos, \
-                                            gene_name, \
+                                            feature_name_disp, \
                                             #row_n, \  # DEBUG
                                             verticalalignment=vert_align, \
                                             horizontalalignment="left", \
