@@ -3807,21 +3807,8 @@ class kb_genetree:
                 if pivot_feature_flag or feature_oi_flag or this_label_show_top or this_label_show_bot:
 
                     # old label
-                    """
                     feature_label = ax.text(label_start_pos, \
                                             label_y_pos, \
-                                            gene_name, \
-                                            #row_n, \  # DEBUG
-                                            verticalalignment=vert_align, \
-                                            horizontalalignment="left", \
-                                            transform=ax.transAxes, \
-                                            color=label_color, \
-                                            fontsize=arrow_label_fontsize, \
-                                            zorder=1)
-                    """
-                    print ("GENE NAME: {}".format(gene_name))  # DEBUG
-                    feature_label = ax.text(0, \
-                                            0, \
                                             gene_name, \
                                             #row_n, \  # DEBUG
                                             verticalalignment=vert_align, \
