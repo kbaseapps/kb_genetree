@@ -1043,6 +1043,8 @@ class kb_genetree:
                             locus_tag = alias  # fix this to match regexp \D+_?\d+ (but not IPR*), and stop assignment
                         aliases.append(alias)
                     elif isinstance(alias,tuple):
+                        if alias[0] == 'gene':
+                            name = alias[1]  # this is where we want the name from!
                         if locus_tag == f['id'] and 'IPR' not in alias[0]:
                             locus_tag = alias[0]  # fix this to match regexp \D+_?\d+ (but not IPR*), and stop assignment
                         aliases.append(alias)
@@ -4750,19 +4752,26 @@ class kb_genetree:
 
         # Instantiate fig_KGB
         #   
-        fig_KGB = pyplot.figure(1, (figure_width, top_nav_height + figure_height_scaling*(total_rows+1)))
+        if not Hide_controls:
+            figure_height = top_nav_height + figure_height_scaling*(total_rows+1)
+        else:
+            figure_height = figure_height_scaling*(total_rows+1)
+        fig_KGB = pyplot.figure(1, (figure_width, figure_height))
         #fig_KGB.suptitle(tool_title, fontsize=20)
 
-        # want to maintain constant top nav height, so adjust proportion according to number of rows
-        # e.g. with 6 tracks, top nav should be 2 units, so top rowspan=2 when bottom rowspan = 6 and grid is 8
-        top_nav_rows = int(round(1000*top_nav_height/(top_nav_height+figure_height_scaling*(total_rows+1))))
+        if not Hide_controls:
+            # want to maintain constant top nav height, so adjust proportion according to number of rows
+            # e.g. with 6 tracks, top nav should be 2 units, so top rowspan=2 when bottom rowspan = 6 and grid is 8
+            top_nav_rows = int(round(1000*top_nav_height/(top_nav_height+figure_height_scaling*(total_rows+1))))
 
-        # subplot2grid(shape, loc, rowspan=1, colspan=1)
-        ax_top_left   = pyplot.subplot2grid((1000,4),            (0,0), rowspan=top_nav_rows,        colspan=1)
-        ax_top_center = pyplot.subplot2grid((1000,4),            (0,1), rowspan=top_nav_rows,        colspan=3)
-        ax_left       = pyplot.subplot2grid((1000,4), (top_nav_rows,0), rowspan=(1000-top_nav_rows), colspan=1)
-        ax_center     = pyplot.subplot2grid((1000,4), (top_nav_rows,1), rowspan=(1000-top_nav_rows), colspan=3)
-
+            # subplot2grid(shape, loc, rowspan=1, colspan=1)
+            ax_top_left   = pyplot.subplot2grid((1000,4),            (0,0), rowspan=top_nav_rows,        colspan=1)
+            ax_top_center = pyplot.subplot2grid((1000,4),            (0,1), rowspan=top_nav_rows,        colspan=3)
+            ax_left       = pyplot.subplot2grid((1000,4), (top_nav_rows,0), rowspan=(1000-top_nav_rows), colspan=1)
+            ax_center     = pyplot.subplot2grid((1000,4), (top_nav_rows,1), rowspan=(1000-top_nav_rows), colspan=3)
+        else:
+            ax_left       = pyplot.subplot2grid((1000,4), (0,0), rowspan=1000, colspan=1)
+            ax_center     = pyplot.subplot2grid((1000,4), (0,1), rowspan=1000, colspan=3)   
 
         # Let's turn off visibility of all tick labels and boxes here
         for ax in fig_KGB.axes:
@@ -4770,9 +4779,14 @@ class kb_genetree:
             ax.yaxis.set_visible(False)
             for t in ax.get_xticklabels()+ax.get_yticklabels():  # remove tick labels
                 t.set_visible(False)
-        #for ax in [ax_top_left, ax_top_center]:
-        #    ax.set_axis_bgcolor(nav_bg_color)
-        for ax in [ax_top_left, ax_top_center, ax_left, ax_center]:
+        if not Hide_controls:
+            all_axes = [ax_top_left, ax_top_center, ax_left, ax_center]
+            #for ax in [ax_top_left, ax_top_center]:
+            #    ax.set_axis_bgcolor(nav_bg_color)
+        else:
+            all_axes = [ax_left, ax_center]
+            
+        for ax in all_axes:
             ax.spines['top'].set_visible(False) # Get rid of top axis line
             ax.spines['bottom'].set_visible(False) #  bottom axis line
             ax.spines['left'].set_visible(False) #  Get rid of bottom axis line
@@ -4808,7 +4822,6 @@ class kb_genetree:
         #
         if not Hide_controls:
             update_mode_panel (ax_top_left)
-
 
         # Draw control panel (currently, must occur after primary genome read in update_genomebrowser_panel)
         if not Hide_controls:
