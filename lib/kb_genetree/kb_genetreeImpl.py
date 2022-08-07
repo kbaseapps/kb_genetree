@@ -259,12 +259,14 @@ class kb_genetree:
             treeObj = ete3.Tree(newick_string)
             treeObj.ladderize()  # read row order from leaves?
 
-            self.log(console,"TRAVERSING TREE")  # DEBUG
-            #for n in treeObj.traverse('inorder'):
-            for n in treeObj.traverse('preorder'):
-            #for n in treeObj.traverse('postorder'):
-                if n.is_leaf():
-                    ordered_feature_ids.append(n.name)
+            #self.log(console,"TRAVERSING TREE")  # DEBUG
+            ##for n in treeObj.traverse('inorder'):  # inorder not viable option
+            #for n in treeObj.traverse('preorder'):  # THIS IS CORRECT
+            ##for n in treeObj.traverse('postorder'):  # this is wrong
+            #    if n.is_leaf():
+            #        ordered_feature_ids.append(n.name)
+
+            ordered_feature_ids.extend (treeObj.get_leaf_names())  # is this the same as traverse('preorder') to get top to bottom order
 
             return ordered_feature_ids
         
