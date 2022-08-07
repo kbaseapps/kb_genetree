@@ -593,7 +593,7 @@ class kb_genetree:
 
                 GeneTree_obj_name = geneTree_info[NAME_I]
 
-                feature_id_row_order = feature_ids_from_genetree (geneTree_data['tree'])
+                feature_id_row_order = feature_id_order_from_genetree (geneTree_data['tree'])
                 # DEBUG HERE
                 for fid in feature_id_row_order:
                     self.log(console, "FEATURE_ID_FROM_NEWICK: '{}'".format(fid))
