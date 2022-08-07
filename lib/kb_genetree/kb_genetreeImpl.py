@@ -689,6 +689,9 @@ class kb_genetree:
             GenomeSet_names = dict()
         if KBase_backend:
             for genome_ref in GenomeSet_refs:
+
+                print ("GETTING GENOME {}".format(genome_ref))
+                
                 genome_obj = gaAPI_get_genome (genome_ref=genome_ref)
                 Global_KBase_Genomes[genome_ref] = genome_obj
                 #Global_KBase_Assemblies[genome_ref] = ass = ga.get_assembly()
@@ -1077,6 +1080,7 @@ class kb_genetree:
                 print ("CHECKING ALIASES")  # DEBUG
                 #for alias in f['aliases'].keys():
                 for alias in f['aliases']:
+                    print ("ALIAS: {}".format(str(alias)))  # DEBUG
                     if isinstance(alias,str):
                         if locus_tag == f['id'] and 'IPR' not in alias:
                             locus_tag = alias  # fix this to match regexp \D+_?\d+ (but not IPR*), and stop assignment
