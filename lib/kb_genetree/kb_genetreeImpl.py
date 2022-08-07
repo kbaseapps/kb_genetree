@@ -852,7 +852,8 @@ class kb_genetree:
                         "genomebrowser_zoom":                def_genomebrowser_zoom, \
                         "genomebrowser_xshift":              def_genomebrowser_xshift, \
                         "genomebrowser_mode":                def_genomebrowser_mode, \
-                        "genomebrowser_color_namespace":     def_genomebrowser_color_namespace
+                        "genomebrowser_color_namespace":     def_genomebrowser_color_namespace, \
+                        "function_abundance_counts":         {}
                        }
 
         self.log(console,"GOT TO F")  # DEBUG
@@ -1055,14 +1056,15 @@ class kb_genetree:
         #
         def build_feature_rec_kbase (f, f_type='CDS', source_species='', contig_i=0, dna_seq='N'):
             feature_rec = {}
-
+            functions = []
             id_delim = '.'
 
             # IDs and names
+            gene_name = None
             name = f['id']
             name_split = name.split(id_delim)
             name = id_delim.join(name_split[2:])
-
+            
             locus_tag = f['id']
             aliases = []
             if f.get('aliases'):
@@ -1075,6 +1077,7 @@ class kb_genetree:
                     elif isinstance(alias,tuple):
                         if alias[0] == 'gene':
                             name = alias[1]  # this is where we want the name from!
+                            gene_name = alias[1]
                         if locus_tag == f['id'] and 'IPR' not in alias[0]:
                             locus_tag = alias[0]  # fix this to match regexp \D+_?\d+ (but not IPR*), and stop assignment
                         aliases.append(alias)
@@ -1106,13 +1109,17 @@ class kb_genetree:
             if f.get('functions'):
                 if isinstance(f['functions'],list):
                     annotation = "; ".join(f['functions'])
+                    functions = f['functions']
                 else:
                     annotation = f['functions']
+                    functions = [f['functions']]
             elif f.get('function'):
                 if isinstance(f['function'],list):
                     annotation = "; ".join(f['function'])
+                    functions = f['function']
                 else:
                     annotation = f['function']           
+                    functions = [f['function']]
             else:
                 annotation = ''
             EC_in_annotation = ''
@@ -1175,8 +1182,15 @@ class kb_genetree:
             if EC_in_annotation != '':
                 EC_number = EC_in_annotation
 
+            # count functions to determine winner when picking color
+            for fxn in functions:
+                if fxn not in Global_State["function_abundance_counts"]:
+                    Global_State["function_abundance_counts"][fxn] = 0
+                Global_State["function_abundance_counts"][fxn] += 1
+                
             # create feature_rec
             feature_rec = {"source_species": source_species, \
+                           "gene_name": gene_name,
                            "name": name, \
                            "locus_tag": locus_tag, \
                            "ID": feature_ID, # will probably need to make more unique \
@@ -1186,6 +1200,7 @@ class kb_genetree:
                            "end_pos": end, \
                            "strand": strand, \
                            "annot": annotation, \
+                           "functions": functions, \
                            "EC_number": EC_number, \
                            "dna_seq": dna_seq
                           }                         
@@ -3297,7 +3312,11 @@ class kb_genetree:
             elif feature['type'] == "CDS":
 
                 if Global_State['genomebrowser_color_namespace'] == "annot":
-                    if 'annot' in feature:
+
+                    if 'gene_name' in feature and feature['gene_name']:
+                        feature_element_color = color_names[sum([ord(c) for c in feature['gene_name']]) % len(color_names)]
+
+                    elif 'annot' in feature:
                         if feature['annot'] != '' and \
                             (feature['annot'].lower() == "hypothetical protein" \
                             or feature['annot'].lower() == "conserved hypothetical protein" \
@@ -3310,12 +3329,22 @@ class kb_genetree:
                         elif feature['annot'] == '':
                             feature_element_color = "lightgray"
                         else:
-                            if Global_State['genomebrowser_mode'] == "tree" \
-                                or Global_State['genomebrowser_mode'] == "homologs":
-                                if feature['annot'] in annot_repeat:
-                                    feature_element_color = color_names[sum([ord(c) for c in feature['annot']]) % len(color_names)]
-                            else:
-                                feature_element_color = color_names[sum([ord(c) for c in feature['annot']]) % len(color_names)]
+                            # use most common function for the color
+                            #if Global_State['genomebrowser_mode'] == "tree" \
+                            #    or Global_State['genomebrowser_mode'] == "homologs":
+                            #    if feature['annot'] in annot_repeat:
+                            #        feature_element_color = color_names[sum([ord(c) for c in feature['annot']]) % len(color_names)]
+                            #else:
+                            #    feature_element_color = color_names[sum([ord(c) for c in feature['annot']]) % len(color_names)]
+
+                            # color by most abundant function
+                            most_abundant_fxn = None
+                            most_abundant_cnt = 0
+                            for fxn in sorted(feature['functions']): # must sort to avoid ties
+                                if Global_State["function_abundance_counts"][fxn] > most_abundant_cnt:
+                                    most_abundant_count = Global_State["function_abundance_counts"][fxn]
+                                    most_abundant_fxn = fxn
+                            feature_element_color = color_names[sum([ord(c) for c in most_abundant_fxn]) % len(color_names)]
 
                 elif Global_State['genomebrowser_color_namespace'] == "ec":
                     if 'EC_number' in feature and feature['EC_number'] != '':
