@@ -3848,7 +3848,8 @@ class kb_genetree:
                    this_label_show_bot:
                     
                     feature_name_disp = gene_name  # maybe add more options here
-                    if len(feature_name_disp) <= max_feature_disp_len:
+                    if False:
+                    #if len(feature_name_disp) <= max_feature_disp_len:
                     
                         # label
                         feature_label = ax.text(label_start_pos, \
