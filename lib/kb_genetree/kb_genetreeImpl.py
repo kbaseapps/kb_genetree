@@ -1080,11 +1080,11 @@ class kb_genetree:
                 print ("CHECKING ALIASES")  # DEBUG
                 #for alias in f['aliases'].keys():
                 for alias in f['aliases']:
+                    aliases.append(alias)
                     print ("ALIAS: {}".format(str(alias)))  # DEBUG
                     if isinstance(alias,str):
                         if locus_tag == f['id'] and 'IPR' not in alias:
                             locus_tag = alias  # fix this to match regexp \D+_?\d+ (but not IPR*), and stop assignment
-                        aliases.append(alias)
                     elif isinstance(alias,tuple):
                         if alias[0] == 'gene':
                             name = alias[1]  # this is where we want the name from!
@@ -1092,10 +1092,11 @@ class kb_genetree:
                             print ("GOT GENE_NAME: {}".format(gene_name))  # DEBUG
                         if locus_tag == f['id'] and 'IPR' not in alias[0]:
                             locus_tag = alias[0]  # fix this to match regexp \D+_?\d+ (but not IPR*), and stop assignment
-                        aliases.append(alias)
                     elif isinstance(alias,list):
-                        aliases.append(alias)
-                        
+                        if alias[0] == 'gene':
+                            name = alias[1]  # this is where we want the name from!
+                            gene_name = alias[1]
+                            print ("GOT GENE_NAME: {}".format(gene_name))  # DEBUG
                     else:
                         raise ValueError ("unknown alias type "+str(alias))
 
