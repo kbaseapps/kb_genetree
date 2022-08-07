@@ -3823,7 +3823,8 @@ class kb_genetree:
                 # new label pos
                 label_start_pos = feature_element_start_pos
                 label_y_pos = y_pos_base
-                vert_align = "middle"
+                vert_align = "center"   # 'top', 'bottom', 'center', 'baseline', 'center_baseline'
+                
 #                if Global_State['genomebrowser_window_bp_width'] > text_disp_window_bp_limit or this_label_show_top:
 #                    vert_align = "bottom"
 #                    #label_y_pos += 0.9*text_yshift
@@ -3845,7 +3846,7 @@ class kb_genetree:
                     feature_name_disp = gene_name  # maybe add more options here
                     if len(feature_name_disp) <= max_feature_disp_len:
                     
-                        # old label
+                        # label
                         feature_label = ax.text(label_start_pos, \
                                                 label_y_pos, \
                                                 feature_name_disp, \
