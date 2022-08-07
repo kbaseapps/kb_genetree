@@ -3287,7 +3287,10 @@ class kb_genetree:
             y_pos_base = bottom_margin + (1.0-bottom_margin-top_margin)*row_delta*(total_rows-row_n)
             #y_pos_base = bottom_margin + (1.0-bottom_margin-top_margin)*row_delta*(max_row_n-row_n)
             #y_pos_base = 1.0-0.02*row_n  # DEBUG
-
+            
+            # shift up to match tree due to scale bar at bottom
+            if Global_State['genomebrowser_mode'] == 'tree':
+                y_pos_base += .05  
 
             # direction
             if feature['strand'] == '-':
@@ -3824,7 +3827,7 @@ class kb_genetree:
                 label_start_pos = feature_element_start_pos
                 label_y_pos = y_pos_base
                 print ("ROW: {} y_pos: {}".format(row_n, label_y_pos))
-                label_y_pos += 0.8 * float(row_n) / float(max_row_n)
+                label_y_pos += 0.08 * float(row_n) / float(max_row_n)
                 vert_align = "center"   # top,bottom,center,baseline,center_baseline
                 
 #                if Global_State['genomebrowser_window_bp_width'] > text_disp_window_bp_limit or this_label_show_top:
