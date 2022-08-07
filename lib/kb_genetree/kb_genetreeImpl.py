@@ -3319,7 +3319,7 @@ class kb_genetree:
 
                 if Global_State['genomebrowser_color_namespace'] == "annot":
 
-                    if 'gene_name' in feature and feature['gene_name']:
+                    if feature.get('gene_name'):
                         print ("setting color for gene_name {}".format(feature['gene_name']))  # DEBUG
                         feature_element_color = color_names[sum([ord(c) for c in feature['gene_name']]) % len(color_names)]
 
@@ -3807,7 +3807,6 @@ class kb_genetree:
                                             fontsize=arrow_label_fontsize, \
                                             zorder=1)
                     """
-                    print ("LABEL COLOR: {} FONTSIZE: {}".format(label_color,arrow_label_fontsize))  # DEBUG
                     print ("GENE NAME: {}".format(gene_name))  # DEBUG
                     feature_label = ax.text(0, \
                                             0, \
