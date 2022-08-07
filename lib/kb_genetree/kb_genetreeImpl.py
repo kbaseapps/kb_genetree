@@ -594,18 +594,19 @@ class kb_genetree:
                 GeneTree_obj_name = geneTree_info[NAME_I]
 
                 feature_id_row_order = feature_id_order_from_genetree (geneTree_data['tree'])
-                # DEBUG HERE
-                for fid in feature_id_row_order:
-                    self.log(console, "FEATURE_ID_FROM_NEWICK: '{}'".format(fid))
-                for leaf_id in geneTree_data['leaf_list']:
-                    self.log(console, "LEAF_ID_FROM_OBJ: '{}'".format(fid))
+                # DEBUG
+                #for fid in feature_id_row_order:
+                #    self.log(console, "FEATURE_ID_FROM_NEWICK: '{}'".format(fid))
+                #for leaf_id in geneTree_data['leaf_list']:
+                #    self.log(console, "LEAF_ID_FROM_OBJ: '{}'".format(leaf_id))
 
                 # build PivotFeatures and GenomeSet_Refs
                 def hex2ascii(matchobj):
                     hex_val = matchobj.group(0).lstrip('%')
                     return bytearray.fromhex(hex_val).decode()
 
-                for leaf_id in geneTree_data['leaf_list']:
+                #for leaf_id in geneTree_data['leaf_list']:
+                for leaf_id in feature_id_row_order:
                     leaf_id = re.sub (r'%[\da-f][\da-f]', hex2ascii, leaf_id)
                     #print ("LEAF_ID: '"+leaf_id+"'")  # DEBUG
                     [genome_ref, f_id] = leaf_id.split(genome_ref_feature_id_delim)
