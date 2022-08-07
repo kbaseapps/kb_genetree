@@ -1073,12 +1073,9 @@ class kb_genetree:
             if len(name_split) > 2:
                 name = id_delim.join(name_split[len(name_split)-2:])
                 
-            print ("NAME: {}".format(name))  # DEBUG
-                
             locus_tag = f['id']
             aliases = []
             if f.get('aliases'):
-                print ("CHECKING ALIASES")  # DEBUG
                 #for alias in f['aliases'].keys():
                 for alias in f['aliases']:
                     aliases.append(alias)
@@ -1203,8 +1200,6 @@ class kb_genetree:
                 Global_State["function_abundance_counts"][fxn] += 1
 
 
-            print ("FINAL NAME: {} and GENE_NAME: {}".format(name, gene_name))  # DEBUG
-                
             # create feature_rec
             feature_rec = {"source_species": source_species, \
                            "gene_name": gene_name,
@@ -3333,7 +3328,6 @@ class kb_genetree:
                 if Global_State['genomebrowser_color_namespace'] == "annot":
 
                     if feature.get('gene_name'):
-                        print ("setting color for gene_name {}".format(feature['gene_name']))  # DEBUG
                         feature_element_color = color_names[sum([ord(c) for c in feature['gene_name']]) % len(color_names)]
 
                     elif 'annot' in feature:
