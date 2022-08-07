@@ -3827,25 +3827,21 @@ class kb_genetree:
                 """
 
                 # new label pos
+                label_start_pos = feature_element_start_pos
+                label_y_pos = y_pos_base
                 if Global_State['genomebrowser_window_bp_width'] > text_disp_window_bp_limit or this_label_show_top:
                     vert_align = "bottom"
-                    #label_y_pos = y_pos_base + 0.9*text_yshift
-                    label_y_pos = y_pos_base
+                    #label_y_pos += 0.9*text_yshift
                     if direction == "rev":
                         label_start_pos += .0015
-                    #else:
-                    #    label_start_pos += .0005
                 else:
                     vert_align = "top"
-                    #label_y_pos = y_pos_base - 1.25*text_yshift
-                    label_y_pos = y_pos_base
+                    #label_y_pos -= 1.25*text_yshift
                     if direction == "rev":
                         label_start_pos += .0050
-                    #else:
-                    #    label_start_pos += .0005
-
 
                 # draw label
+                #
                 if pivot_feature_flag or \
                    feature_oi_flag or \
                    this_label_show_top or \
