@@ -4285,7 +4285,9 @@ class kb_genetree:
                 img_units = "in"
                 img_pix_width = 200
                 img_in_width = round(float(img_pix_width)/float(dpi), 1)
-                img_in_height = 40 * total_rows
+                #img_pix_height = 40 * total_rows
+                img_pix_height = 10 * total_rows
+                img_in_height = round(float(img_pix_height)/float(dpi), 1)
                 self.log(console,"SAVING TREE IMAGE")  # DEBUG
                 treeObj.render(tree_img_path, w=img_in_width, h=img_in_height, units=img_units, dpi=dpi, tree_style=ts)
                 #treeObj.render(tree_img_path, w=img_in_width, units=img_units, dpi=dpi, tree_style=ts)
