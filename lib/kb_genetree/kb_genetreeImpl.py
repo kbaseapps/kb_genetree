@@ -260,7 +260,9 @@ class kb_genetree:
             treeObj.ladderize()  # read row order from leaves?
 
             self.log(console,"TRAVERSING TREE")  # DEBUG
-            for n in treeObj.traverse('postorder'):
+            #for n in treeObj.traverse('inorder'):
+            for n in treeObj.traverse('preorder'):
+            #for n in treeObj.traverse('postorder'):
                 if n.is_leaf():
                     ordered_feature_ids.append(n.name)
 
