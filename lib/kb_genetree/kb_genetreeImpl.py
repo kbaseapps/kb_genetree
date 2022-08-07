@@ -598,7 +598,6 @@ class kb_genetree:
                     #to get the full stack trace: traceback.format_exc()
 
                 GeneTree_obj_name = geneTree_info[NAME_I]
-
                 feature_id_row_order = feature_id_order_from_genetree (geneTree_data['tree'])
                 # DEBUG
                 #for fid in feature_id_row_order:
@@ -1067,11 +1066,15 @@ class kb_genetree:
             gene_name = None
             name = f['id']
             name_split = name.split(id_delim)
-            name = id_delim.join(name_split[2:])
-            
+            if len(name_split) > 2:
+                name = id_delim.join(name_split[len(name_split)-2:])
+                
+            print ("NAME: {}".format(name))  # DEBUG
+                
             locus_tag = f['id']
             aliases = []
             if f.get('aliases'):
+                print ("CHECKING ALIASES")  # DEBUG
                 #for alias in f['aliases'].keys():
                 for alias in f['aliases']:
                     if isinstance(alias,str):
@@ -1082,6 +1085,7 @@ class kb_genetree:
                         if alias[0] == 'gene':
                             name = alias[1]  # this is where we want the name from!
                             gene_name = alias[1]
+                            print ("GOT GENE_NAME: {}".format(gene_name))  # DEBUG
                         if locus_tag == f['id'] and 'IPR' not in alias[0]:
                             locus_tag = alias[0]  # fix this to match regexp \D+_?\d+ (but not IPR*), and stop assignment
                         aliases.append(alias)
@@ -1191,6 +1195,9 @@ class kb_genetree:
                 if fxn not in Global_State["function_abundance_counts"]:
                     Global_State["function_abundance_counts"][fxn] = 0
                 Global_State["function_abundance_counts"][fxn] += 1
+
+
+            print ("FINAL NAME: {} and GENE_NAME: {}".format(name, gene_name))  # DEBUG
                 
             # create feature_rec
             feature_rec = {"source_species": source_species, \
