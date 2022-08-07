@@ -260,7 +260,7 @@ class kb_genetree:
             treeObj.ladderize()  # read row order from leaves?
 
             self.log(console,"TRAVERSING TREE")  # DEBUG
-            for n in treeObj.traverse():
+            for n in treeObj.traverse('postorder'):
                 if n.is_leaf():
                     ordered_feature_ids.append(n.name)
 
@@ -4173,7 +4173,7 @@ class kb_genetree:
                 import ete3
                 self.log(console,"INSTANTIATE TREE")  # DEBUG
                 treeObj = ete3.Tree(newick_string)
-                treeObj.ladderize()  # read row order from leaves?
+                #treeObj.ladderize()  # read row order from leaves?
                 ts = ete3.TreeStyle()
                 self.log(console,"SET TREE STYLE")  # DEBUG
                 #ts.show_leaf_name = True
