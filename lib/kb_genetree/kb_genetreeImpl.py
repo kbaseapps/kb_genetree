@@ -3348,11 +3348,11 @@ class kb_genetree:
                             most_abundant_fxn = None
                             most_abundant_cnt = 0
                             for fxn in sorted(feature['functions']): # must sort to avoid ties
-                                print ("checking fxn {}".format(fxn))  # DEBUG
+                                #print ("checking fxn {}".format(fxn))  # DEBUG
                                 if Global_State["function_abundance_counts"][fxn] > most_abundant_cnt:
                                     most_abundant_count = Global_State["function_abundance_counts"][fxn]
                                     most_abundant_fxn = fxn
-                            print ("most abundant fxn {}".format(most_abundant_fxn))  # DEBUG
+                            #print ("most abundant fxn {}".format(most_abundant_fxn))  # DEBUG
                             feature_element_color = color_names[sum([ord(c) for c in most_abundant_fxn]) % len(color_names)]
 
                 elif Global_State['genomebrowser_color_namespace'] == "ec":
@@ -3793,8 +3793,24 @@ class kb_genetree:
 
                 # draw label
                 if pivot_feature_flag or feature_oi_flag or this_label_show_top or this_label_show_bot:
+
+                    # old label
+                    """
                     feature_label = ax.text(label_start_pos, \
                                             label_y_pos, \
+                                            gene_name, \
+                                            #row_n, \  # DEBUG
+                                            verticalalignment=vert_align, \
+                                            horizontalalignment="left", \
+                                            transform=ax.transAxes, \
+                                            color=label_color, \
+                                            fontsize=arrow_label_fontsize, \
+                                            zorder=1)
+                    """
+                    print ("LABEL COLOR: {} FONTSIZE: {}".format(label_color,arrow_label_fontsize))  # DEBUG
+                    print ("GENE NAME: {}".format(gene_name))  # DEBUG
+                    feature_label = ax.text(0, \
+                                            0, \
                                             gene_name, \
                                             #row_n, \  # DEBUG
                                             verticalalignment=vert_align, \
