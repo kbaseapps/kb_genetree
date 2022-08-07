@@ -1079,7 +1079,6 @@ class kb_genetree:
                 #for alias in f['aliases'].keys():
                 for alias in f['aliases']:
                     aliases.append(alias)
-                    print ("ALIAS: {}".format(str(alias)))  # DEBUG
                     if isinstance(alias,str):
                         if locus_tag == f['id'] and 'IPR' not in alias:
                             locus_tag = alias  # fix this to match regexp \D+_?\d+ (but not IPR*), and stop assignment
@@ -1087,14 +1086,12 @@ class kb_genetree:
                         if alias[0] == 'gene':
                             name = alias[1]  # this is where we want the name from!
                             gene_name = alias[1]
-                            print ("GOT GENE_NAME: {}".format(gene_name))  # DEBUG
                         if locus_tag == f['id'] and 'IPR' not in alias[0]:
                             locus_tag = alias[0]  # fix this to match regexp \D+_?\d+ (but not IPR*), and stop assignment
                     elif isinstance(alias,list):
                         if alias[0] == 'gene':
                             name = alias[1]  # this is where we want the name from!
                             gene_name = alias[1]
-                            print ("GOT GENE_NAME: {}".format(gene_name))  # DEBUG
                     else:
                         raise ValueError ("unknown alias type "+str(alias))
 
@@ -3290,7 +3287,7 @@ class kb_genetree:
             
             # shift up to match tree due to scale bar at bottom
             if Global_State['genomebrowser_mode'] == 'tree':
-                y_pos_base += .05  
+                y_pos_base += .1 / float(max_row_n)
 
             # direction
             if feature['strand'] == '-':
