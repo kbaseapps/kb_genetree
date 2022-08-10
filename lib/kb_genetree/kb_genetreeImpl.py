@@ -3848,7 +3848,7 @@ class kb_genetree:
                    this_label_show_bot:
                     
                     feature_name_disp = gene_name  # maybe add more options here
-                    if False:
+                    if row_n == 0 or row_n == 1:
                     #if len(feature_name_disp) <= max_feature_disp_len:
                     
                         # label
