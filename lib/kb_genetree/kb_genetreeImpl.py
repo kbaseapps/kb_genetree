@@ -3376,6 +3376,8 @@ class kb_genetree:
                 if Global_State['genomebrowser_color_namespace'] == "annot":
 
                     if feature.get('gene_name'):
+                        # DEBUG
+                        print ("COLOR SET for row {} gene name: {}".format(row_n, feature['gene_name']))
                         feature_element_color = color_names[sum([ord(c) for c in feature['gene_name']]) % len(color_names)]
 
                     elif 'annot' in feature:
@@ -3407,7 +3409,7 @@ class kb_genetree:
                                 if Global_State["function_abundance_counts"][fxn] > most_abundant_cnt:
                                     most_abundant_count = Global_State["function_abundance_counts"][fxn]
                                     most_abundant_fxn = fxn
-                            #print ("most abundant fxn {}".format(most_abundant_fxn))  # DEBUG
+                            print ("COLOR FOR ROW {} most abundant fxn {}".format(row_n, most_abundant_fxn))  # DEBUG
                             feature_element_color = color_names[sum([ord(c) for c in most_abundant_fxn]) % len(color_names)]
 
                 elif Global_State['genomebrowser_color_namespace'] == "ec":
