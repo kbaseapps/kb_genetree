@@ -3383,11 +3383,11 @@ class kb_genetree:
 
                 if Global_State['genomebrowser_color_namespace'] == "annot":
 
-                    if feature.get('gene_name') \
-                       and float(Global_State['function_abundance_counts'][feature['gene_name']]) / float(max_row_n) >= color_frac_min:
-                        # DEBUG
-                        print ("COLOR SET for row {} feature_j:{} pivot_strand:{}  gene name: {}".format(row_n, feature_j, pivot_strand, feature['gene_name']))
-                        feature_element_color = color_names[sum([ord(c) for c in feature['gene_name']]) % len(color_names)]
+                    if feature.get('gene_name'):
+                        if float(Global_State['function_abundance_counts'][feature['gene_name']]) / float(max_row_n) >= color_frac_min:
+                            # DEBUG
+                            print ("COLOR SET for row {} feature_j:{} pivot_strand:{}  gene name: {}".format(row_n, feature_j, pivot_strand, feature['gene_name']))
+                            feature_element_color = color_names[sum([ord(c) for c in feature['gene_name']]) % len(color_names)]
 
                     elif feature.get('annot'):
                         if "hypothetical protein" in feature['annot'].lower():
