@@ -3248,14 +3248,14 @@ class kb_genetree:
                 genome_beg_pos = feature['beg_pos']
                 genome_end_pos = feature['end_pos']
                 
-            window_beg_pos = disp_coord_transform (feature['beg_pos'], \
+            window_beg_pos = disp_coord_transform (genome_beg_pos, \
                                                    pivot_pos, \
                                                    pivot_strand, \
                                                    Global_State['genomebrowser_window_bp_width'], \
                                                    Global_State['genomebrowser_xshift'], \
                                                    track_xshift, \
                                                    contig_mode_xshift)
-            window_end_pos = disp_coord_transform (feature['end_pos'],
+            window_end_pos = disp_coord_transform (genome_end_pos, \
                                                    pivot_pos, \
                                                    pivot_strand, \
                                                    Global_State['genomebrowser_window_bp_width'], \
