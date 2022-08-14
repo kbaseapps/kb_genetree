@@ -3186,13 +3186,10 @@ class kb_genetree:
             track_disp_scale_factor = (1.0-right_margin-left_margin) / genomebrowser_window_bp_width
             #transformed_x = track_disp_scale_factor * (x - (pivot_pos-0.5*genomebrowser_window_bp_width))
 
-            """
             if pivot_strand == '-' and Global_State['genomebrowser_mode'] == 'tree':
-                transformed_x = track_disp_scale_factor * (x + (pivot_pos+genomebrowser_xshift+track_xshift+contig_mode_xshift-0.5*genomebrowser_window_bp_width))
+                transformed_x = track_disp_scale_factor * (-x + (pivot_pos+genomebrowser_xshift+track_xshift+contig_mode_xshift-0.5*genomebrowser_window_bp_width))
             else:
                 transformed_x = track_disp_scale_factor * (x - (pivot_pos+genomebrowser_xshift+track_xshift+contig_mode_xshift-0.5*genomebrowser_window_bp_width))
-            """
-            transformed_x = track_disp_scale_factor * (x - (pivot_pos+genomebrowser_xshift+track_xshift+contig_mode_xshift-0.5*genomebrowser_window_bp_width))
                 
             return left_margin + transformed_x
 
