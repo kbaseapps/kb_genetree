@@ -3382,13 +3382,15 @@ class kb_genetree:
 
                     elif 'annot' in feature:
                         if feature['annot'] != '' and \
+                            "hypothetical protein" in feature['annot'].lower():
+                            """
                             (feature['annot'].lower() == "hypothetical protein" \
                             or feature['annot'].lower() == "conserved hypothetical protein" \
                             or feature['annot'].lower() == "orf, hypothetical protein" \
                             or feature['annot'].lower() == "orf, conserved hypothetical protein" \
                             or feature['annot'].lower() == "hypothetical protein; orphan" \
                             or feature['annot'].lower() == "hypothetical protein; genus orphan"):
-
+                            """
                             feature_element_color = "darkgray"
                         elif feature['annot'] == '':
                             feature_element_color = "lightgray"
@@ -3410,7 +3412,11 @@ class kb_genetree:
                                     most_abundant_count = Global_State["function_abundance_counts"][fxn]
                                     most_abundant_fxn = fxn
                             print ("COLOR FOR ROW {} most abundant fxn {}".format(row_n, most_abundant_fxn))  # DEBUG
-                            feature_element_color = color_names[sum([ord(c) for c in most_abundant_fxn]) % len(color_names)]
+                            color_frac_min = 0.75
+                            if float(most_abundant_count) / float(max_row_n) < color_frac_min:
+                                feature_element_color = "lightgray"
+                            else:
+                                feature_element_color = color_names[sum([ord(c) for c in most_abundant_fxn]) % len(color_names)]
 
                 elif Global_State['genomebrowser_color_namespace'] == "ec":
                     if 'EC_number' in feature and feature['EC_number'] != '':
