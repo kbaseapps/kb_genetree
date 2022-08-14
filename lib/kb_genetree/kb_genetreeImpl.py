@@ -3413,8 +3413,8 @@ class kb_genetree:
                                     most_abundant_fxn = fxn
                             print ("COLOR FOR ROW {} most abundant fxn {}".format(row_n, most_abundant_fxn))  # DEBUG
 
-                            color_frac_min = 0.0
-                            #color_frac_min = 0.75
+                            #color_frac_min = 0.0
+                            color_frac_min = 0.75
                             if Global_State['genomebrowser_mode'] == 'tree' \
                                and float(most_abundant_count) / float(max_row_n) < color_frac_min:
                                 feature_element_color = "lightgray"
