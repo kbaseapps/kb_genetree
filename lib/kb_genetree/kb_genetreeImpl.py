@@ -3185,10 +3185,14 @@ class kb_genetree:
 
             track_disp_scale_factor = (1.0-right_margin-left_margin) / genomebrowser_window_bp_width
             #transformed_x = track_disp_scale_factor * (x - (pivot_pos-0.5*genomebrowser_window_bp_width))
+
+            """
             if pivot_strand == '-' and Global_State['genomebrowser_mode'] == 'tree':
                 transformed_x = track_disp_scale_factor * (x + (pivot_pos+genomebrowser_xshift+track_xshift+contig_mode_xshift-0.5*genomebrowser_window_bp_width))
             else:
                 transformed_x = track_disp_scale_factor * (x - (pivot_pos+genomebrowser_xshift+track_xshift+contig_mode_xshift-0.5*genomebrowser_window_bp_width))
+            """
+            transformed_x = track_disp_scale_factor * (x - (pivot_pos+genomebrowser_xshift+track_xshift+contig_mode_xshift-0.5*genomebrowser_window_bp_width))
                 
             return left_margin + transformed_x
 
@@ -3298,19 +3302,49 @@ class kb_genetree:
             #    y_pos_base += .5 / float(max_row_n)
 
             # direction
-            if feature['strand'] == '-':
-                direction = 'rev'
-                feature_element_start_pos = x_pos+feature_element_base_length+head_l
-                #label_start_pos = x_pos+head_l
-                label_start_pos = x_pos
-                dir_adj = -1.0
-                drop_shadow_xshift = 1
+            if Global_State['genomebrowser_mode'] == 'tree':
+                if pivot_strand == '-':
+                    if feature['strand'] == '+':
+                        direction = 'rev'
+                        feature_element_start_pos = x_pos+feature_element_base_length+head_l
+                        #label_start_pos = x_pos+head_l
+                        label_start_pos = x_pos
+                        dir_adj = -1.0
+                        drop_shadow_xshift = 1
+                    else:
+                        direction = 'fwd'
+                        feature_element_start_pos = x_pos
+                        label_start_pos = x_pos
+                        dir_adj = 1.0
+                        drop_shadow_xshift = 0
+                else:
+                    if feature['strand'] == '-':
+                        direction = 'rev'
+                        feature_element_start_pos = x_pos+feature_element_base_length+head_l
+                        #label_start_pos = x_pos+head_l
+                        label_start_pos = x_pos
+                        dir_adj = -1.0
+                        drop_shadow_xshift = 1
+                    else:
+                        direction = 'fwd'
+                        feature_element_start_pos = x_pos
+                        label_start_pos = x_pos
+                        dir_adj = 1.0
+                        drop_shadow_xshift = 0
             else:
-                direction = 'fwd'
-                feature_element_start_pos = x_pos
-                label_start_pos = x_pos
-                dir_adj = 1.0
-                drop_shadow_xshift = 0
+                if feature['strand'] == '-':
+                    direction = 'rev'
+                    feature_element_start_pos = x_pos+feature_element_base_length+head_l
+                    #label_start_pos = x_pos+head_l
+                    label_start_pos = x_pos
+                    dir_adj = -1.0
+                    drop_shadow_xshift = 1
+                else:
+                    direction = 'fwd'
+                    feature_element_start_pos = x_pos
+                    label_start_pos = x_pos
+                    dir_adj = 1.0
+                    drop_shadow_xshift = 0
 
 
             # color
