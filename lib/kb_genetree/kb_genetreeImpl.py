@@ -3181,12 +3181,15 @@ class kb_genetree:
 
         # Diplay coordinate transform
         #
-        def disp_coord_transform (x, pivot_pos, genomebrowser_window_bp_width, genomebrowser_xshift, track_xshift, contig_mode_xshift):
+        def disp_coord_transform (x, pivot_pos, pivot_strand, genomebrowser_window_bp_width, genomebrowser_xshift, track_xshift, contig_mode_xshift):
 
             track_disp_scale_factor = (1.0-right_margin-left_margin) / genomebrowser_window_bp_width
             #transformed_x = track_disp_scale_factor * (x - (pivot_pos-0.5*genomebrowser_window_bp_width))
-            transformed_x = track_disp_scale_factor * (x - (pivot_pos+genomebrowser_xshift+track_xshift+contig_mode_xshift-0.5*genomebrowser_window_bp_width))
-
+            if pivot_strand == '-' and Global_State['genomebrowser_mode'] == 'tree':
+                transformed_x = track_disp_scale_factor * (x + (pivot_pos+genomebrowser_xshift+track_xshift+contig_mode_xshift-0.5*genomebrowser_window_bp_width))
+            else:
+                transformed_x = track_disp_scale_factor * (x - (pivot_pos+genomebrowser_xshift+track_xshift+contig_mode_xshift-0.5*genomebrowser_window_bp_width))
+                
             return left_margin + transformed_x
 
 
@@ -3199,6 +3202,7 @@ class kb_genetree:
                              feature_j, \
                              feature, \
                              pivot_pos, \
+                             pivot_strand, \
                              track_xshift, \
                              contig_mode_xshift, \
                              pivot_feature_flag, \
@@ -3236,12 +3240,14 @@ class kb_genetree:
             # window coords
             window_beg_pos = disp_coord_transform (feature['beg_pos'], \
                                                    pivot_pos, \
+                                                   pivot_strand, \
                                                    Global_State['genomebrowser_window_bp_width'], \
                                                    Global_State['genomebrowser_xshift'], \
                                                    track_xshift, \
                                                    contig_mode_xshift)
             window_end_pos = disp_coord_transform (feature['end_pos'],
                                                    pivot_pos, \
+                                                   pivot_strand, \
                                                    Global_State['genomebrowser_window_bp_width'], \
                                                    Global_State['genomebrowser_xshift'], \
                                                    track_xshift, \
@@ -3580,12 +3586,14 @@ class kb_genetree:
 
                     dom_window_beg_pos = disp_coord_transform (dom_beg_pos, \
                                                    pivot_pos, \
+                                                   pivot_strand, \
                                                    Global_State['genomebrowser_window_bp_width'], \
                                                    Global_State['genomebrowser_xshift'], \
                                                    track_xshift, \
                                                    contig_mode_xshift)
                     dom_window_end_pos = disp_coord_transform (dom_end_pos, \
                                                    pivot_pos, \
+                                                   pivot_strand, \
                                                    Global_State['genomebrowser_window_bp_width'], \
                                                    Global_State['genomebrowser_xshift'], \
                                                    track_xshift, \
@@ -4756,6 +4764,7 @@ class kb_genetree:
                         break
 
                     pivot_pos = 0.5 * (Feature_slices[i][0]['beg_pos']+Feature_slices[i][0]['end_pos'])
+                    pivot_strand = Feature_slices[i][0]['strand']
                     track_xshift = 0
                     if genomebrowser_mode == "genome":
                         #track_xshift = genomebrowser_window_bp_width * (i - (total_rows-1)/2)  # e.g. total_rows=7 -> -3,-2,-1,0,1,2,3
@@ -4780,6 +4789,7 @@ class kb_genetree:
                         this_label_show_bot = False
                         this_beg_pos = disp_coord_transform (Feature_slices[i][j]['beg_pos'], \
                                                              pivot_pos, \
+                                                             pivot_strand, \
                                                              genomebrowser_window_bp_width, \
                                                              genomebrowser_xshift, \
                                                              track_xshift, \
@@ -4805,6 +4815,7 @@ class kb_genetree:
                                          j, \
                                          Feature_slices[i][j], \
                                          pivot_pos, \
+                                         pivot_strand, \
                                          track_xshift, \
                                          contig_mode_xshift, \
                                          pivot_feature_flag, \
