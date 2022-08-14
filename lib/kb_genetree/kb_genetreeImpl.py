@@ -3187,9 +3187,11 @@ class kb_genetree:
             #transformed_x = track_disp_scale_factor * (x - (pivot_pos-0.5*genomebrowser_window_bp_width))
 
             if pivot_strand == '-' and Global_State['genomebrowser_mode'] == 'tree':
-                transformed_x = track_disp_scale_factor * (-x + (pivot_pos+genomebrowser_xshift+track_xshift+contig_mode_xshift-0.5*genomebrowser_window_bp_width))
+                transformed_x = track_disp_scale_factor * ((pivot_pos - x) - (genomebrowser_xshift+track_xshift+contig_mode_xshift-0.5*genomebrowser_window_bp_width))
             else:
-                transformed_x = track_disp_scale_factor * (x - (pivot_pos+genomebrowser_xshift+track_xshift+contig_mode_xshift-0.5*genomebrowser_window_bp_width))
+                # ORIGINAL WORKING FORM
+                #transformed_x = track_disp_scale_factor * (x - (pivot_pos+genomebrowser_xshift+track_xshift+contig_mode_xshift-0.5*genomebrowser_window_bp_width))
+                transformed_x = track_disp_scale_factor * ((x - pivot_pos) - (genomebrowser_xshift+track_xshift+contig_mode_xshift - 0.5*genomebrowser_window_bp_width))
                 
             return left_margin + transformed_x
 
@@ -3239,6 +3241,13 @@ class kb_genetree:
                         break
 
             # window coords
+            if Global_State['genomebrowser_mode'] == 'tree' and pivot_strand == '-':
+                genome_beg_pos = feature['end_pos']
+                genome_end_pos = feature['beg_pos']
+            else:
+                genome_beg_pos = feature['beg_pos']
+                genome_end_pos = feature['end_pos']
+                
             window_beg_pos = disp_coord_transform (feature['beg_pos'], \
                                                    pivot_pos, \
                                                    pivot_strand, \
