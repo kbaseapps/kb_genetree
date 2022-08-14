@@ -3361,8 +3361,8 @@ class kb_genetree:
 
             # color
             #
-            #color_frac_min = 0.0
-            color_frac_min = 0.75
+            color_frac_gene_name_min = 0.25
+            color_frac_function_min = 0.75
             feature_element_color = "lightgray"
             if feature['type'] == "pseudogene":
                 feature_element_color = "gray"
@@ -3384,7 +3384,7 @@ class kb_genetree:
                 if Global_State['genomebrowser_color_namespace'] == "annot":
 
                     if feature.get('gene_name'):
-                        if float(Global_State['function_abundance_counts'][feature['gene_name']]) / float(max_row_n) >= color_frac_min:
+                        if float(Global_State['function_abundance_counts'][feature['gene_name']]) / float(max_row_n) >= color_frac_gene_name_min:
                             # DEBUG
                             print ("COLOR SET for row {} feature_j:{} pivot_strand:{}  gene name: {}".format(row_n, feature_j, pivot_strand, feature['gene_name']))
                             feature_element_color = color_names[sum([ord(c) for c in feature['gene_name']]) % len(color_names)]
@@ -3421,7 +3421,7 @@ class kb_genetree:
                                     most_abundant_fxn = fxn
 
                             if Global_State['genomebrowser_mode'] == 'tree' \
-                               and float(most_abundant_cnt) / float(max_row_n) < color_frac_min:
+                               and float(most_abundant_cnt) / float(max_row_n) < color_frac_function_min:
                                 feature_element_color = "lightgray"
                             else:
                                 print ("COLOR SET for row {} feature_j:{} pivot_strand:{}  most_abund_fxn: {}".format(row_n, feature_j, pivot_strand, most_abundant_fxn))
