@@ -3377,7 +3377,7 @@ class kb_genetree:
 
                     if feature.get('gene_name'):
                         # DEBUG
-                        print ("COLOR SET for row {} gene name: {}".format(row_n, feature['gene_name']))
+                        print ("COLOR SET for row {} feature_j:{} pivot_strand:{}  gene name: {}".format(row_n, feature_j, pivot_strand, feature['gene_name']))
                         feature_element_color = color_names[sum([ord(c) for c in feature['gene_name']]) % len(color_names)]
 
                     elif 'annot' in feature:
@@ -3416,6 +3416,7 @@ class kb_genetree:
                             if float(most_abundant_count) / float(max_row_n) < color_frac_min:
                                 feature_element_color = "lightgray"
                             else:
+                                print ("COLOR SET for row {} feature_j:{} pivot_strand:{}  most_abund_fxn: {}".format(row_n, feature_j, pivot_strand, most_abundant_fxn))
                                 feature_element_color = color_names[sum([ord(c) for c in most_abundant_fxn]) % len(color_names)]
 
                 elif Global_State['genomebrowser_color_namespace'] == "ec":
