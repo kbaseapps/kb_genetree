@@ -1067,7 +1067,7 @@ class kb_genetree:
             id_delim = '.'
 
             # IDs and names
-            gene_name = None
+            gene_name = []
             name = f['id']
             name_split = name.split(id_delim)
             if len(name_split) > 2:
@@ -1085,13 +1085,13 @@ class kb_genetree:
                     elif isinstance(alias,tuple):
                         if alias[0] == 'gene':
                             name = alias[1]  # this is where we want the name from!
-                            gene_name = alias[1]
+                            gene_name.append(alias[1])
                         if locus_tag == f['id'] and 'IPR' not in alias[0]:
                             locus_tag = alias[0]  # fix this to match regexp \D+_?\d+ (but not IPR*), and stop assignment
                     elif isinstance(alias,list):
                         if alias[0] == 'gene':
                             name = alias[1]  # this is where we want the name from!
-                            gene_name = alias[1]
+                            gene_name.append(alias[1])
                     else:
                         raise ValueError ("unknown alias type "+str(alias))
 
@@ -1191,11 +1191,11 @@ class kb_genetree:
                 EC_number = EC_in_annotation
 
             # count functions to determine winner when picking color
-            if gene_name is not None:
-                fxn = gene_name
-                if fxn not in Global_State["function_abundance_counts"]:
-                    Global_State["function_abundance_counts"][fxn] = 0
-                Global_State["function_abundance_counts"][fxn] += 1
+            if len(gene_name) > 0:
+                for fxn in gene_name:
+                    if fxn not in Global_State["function_abundance_counts"]:
+                        Global_State["function_abundance_counts"][fxn] = 0
+                    Global_State["function_abundance_counts"][fxn] += 1
                 
             for fxn in functions:
                 if fxn not in Global_State["function_abundance_counts"]:
@@ -3227,7 +3227,7 @@ class kb_genetree:
                 pivot_feature_flag = True
 
             gene_id = feature['ID']
-            gene_name = feature['name']
+            gene_name = [feature['name']]
             if feature.get('gene_name'):
                 gene_name = feature['gene_name']
             
@@ -3384,10 +3384,21 @@ class kb_genetree:
                 if Global_State['genomebrowser_color_namespace'] == "annot":
 
                     if feature.get('gene_name'):
-                        if float(Global_State['function_abundance_counts'][feature['gene_name']]) / float(max_row_n) >= color_frac_gene_name_min:
+                        most_abundant_fxn = None
+                        most_abundant_cnt = 0
+                        for fxn in sorted(feature['gene_name']): # must sort to get same function when ties
+                            #print ("checking fxn {}".format(fxn))  # DEBUG
+                            if Global_State['function_abundance_counts'][fxn] > most_abundant_cnt:
+                                most_abundant_cnt = Global_State['function_abundance_counts'][fxn]
+                                most_abundant_fxn = fxn
+
+                        if Global_State['genomebrowser_mode'] == 'tree' \
+                           and float(most_abundant_cnt) / float(max_row_n) < color_frac_gene_name_min:
+                            feature_element_color = "lightgray"
+                        else:
                             # DEBUG
                             print ("COLOR SET for row {} feature_j:{} pivot_strand:{}  gene name: {}".format(row_n, feature_j, pivot_strand, feature['gene_name']))
-                            feature_element_color = color_names[sum([ord(c) for c in feature['gene_name']]) % len(color_names)]
+                            feature_element_color = color_names[sum([ord(c) for c in most_abundant_fxn]) % len(color_names)]
 
                     elif feature.get('annot'):
                         if "hypothetical protein" in feature['annot'].lower():
