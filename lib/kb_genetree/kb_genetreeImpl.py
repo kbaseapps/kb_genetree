@@ -1685,7 +1685,7 @@ class kb_genetree:
                         #
                         contig_mode_xshift = 0
                         sci_name = gaAPI_get_scientific_name(genome_obj=genome_obj)
-                        if sci_name == '' or sci_name.lower() == 'unknown':
+                        if sci_name == '' or sci_name.lower().startswith('unknown'):
                             source = genome_obj['info'][NAME_I]
                         else:
                             source = sci_name
@@ -3923,7 +3923,7 @@ class kb_genetree:
                    this_label_show_top or \
                    this_label_show_bot:
 
-                    print ("ROW_N:{} CONTIG_NAME:{}".format(row_n,Global_State['Contig_names'][row_n-1])) 
+                    print ("ROW_N:{} source:{}".format(row_n,feature['source_species']))
                     
                     feature_name_disp = gene_name  # maybe add more options here
                     if False:
