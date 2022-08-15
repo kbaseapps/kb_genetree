@@ -3922,9 +3922,12 @@ class kb_genetree:
                    feature_oi_flag or \
                    this_label_show_top or \
                    this_label_show_bot:
+
+                    print ("ROW_N:{} CONTIG_NAME:{}".format(row_n,Global_State['Contig_names'][row_n-1])) 
                     
                     feature_name_disp = gene_name  # maybe add more options here
-                    if row_n == 0 or row_n == 1:
+                    if False:
+                    #if row_n == 0 or row_n == 1:
                     #if len(feature_name_disp) <= max_feature_disp_len:
                     
                         # label
