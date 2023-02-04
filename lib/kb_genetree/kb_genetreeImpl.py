@@ -892,6 +892,10 @@ class kb_genetree:
             total_rows = max_rows
         #figure_width = 12.0
         figure_width = 11.0
+        def_fig_width_in_bp = 16000.0
+        figure_width_adjust = 0.5 * (figure_width/def_fig_width_in_bp) * (def_genomebrowser_window_bp_width - def_fig_width_in_bp)
+        if figure_width_adjust > 0:
+            figure_width += figure_width_adjust
         figure_height_scaling = 0.75
         top_nav_height = 1.5
         #top_margin = 1.0/total_rows
