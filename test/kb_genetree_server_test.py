@@ -76,7 +76,11 @@ class kb_genetreeTest(unittest.TestCase):
         ret = self.serviceImpl.run_genetree_genome_context (self.ctx,
                      #{'workspace_name': self.wsName,
                      {'workspace_name': debug_workspace_name,
-                      'input_genetree_ref': debug_genetree_ref
+                      'input_genetree_ref': debug_genetree_ref,
+                      'genome_disp_name_config': "obj_name",
+                      'slice_width': 20.0,
+                      'max_rows': 100,
+                      'prevalence_color_threshold': 25.0
                      }
                     )
         print ("DONE")

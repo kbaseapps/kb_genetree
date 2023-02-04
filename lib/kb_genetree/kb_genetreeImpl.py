@@ -32,9 +32,9 @@ class kb_genetree:
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "0.0.1"
+    VERSION = "0.0.2"
     GIT_URL = "https://github.com/kbaseapps/kb_genetree"
-    GIT_COMMIT_HASH = "fda774f8b63f9d53307a95a0ea0359039e8e5230"
+    GIT_COMMIT_HASH = "3c9265dcf9080e0981f5c8e2006fafeb830cb5ee"
 
     #BEGIN_CLASS_HEADER
     def now_ISO(self):
@@ -69,8 +69,11 @@ class kb_genetree:
            (run_genetree_genome_context() ** ** create an interactive report
            image of a tree browser) -> structure: parameter "workspace_name"
            of type "workspace_name" (** Common types), parameter
+           "workspace_id" of type "workspace_id", parameter
            "input_genetree_ref" of type "data_obj_ref", parameter
-           "genome_disp_name_config" of String
+           "genome_disp_name_config" of String, parameter "slice_width" of
+           Double, parameter "max_rows" of Long, parameter
+           "prevalence_color_threshold" of Double
         :returns: instance of type "ReportResults" (** Report Results) ->
            structure: parameter "report_name" of String, parameter
            "report_ref" of String
@@ -86,10 +89,17 @@ class kb_genetree:
         required_params = ['workspace_name',
                            'input_genetree_ref'
                            ]
+        default_params = { 'genome_disp_name_config': "obj_name",
+                           'slice_width': 20.0,
+                           'max_rows': 200,
+                           'prevalence_color_threshold': 25.0
+                           }
         for arg in required_params:
             if arg not in params or params[arg] == None or params[arg] == '':
                 raise ValueError("Must define required param: '" + arg + "'")
-        
+        for arg in default_params.keys():
+            if arg not in params or params[arg] == None or params[arg] == '':
+                params[arg] = default_params[arg]
 
         # INIT VARS
         KBase_backend = True
@@ -116,14 +126,14 @@ class kb_genetree:
 
         self.log(console,"GOT TO A")  # DEBUG
 
-        # RUN KGB
+        # RUN KBGB
         #%pylab notebook
         #try:  
         #    from urllib2 import urlopen
         #except ImportError:  
         #    from urllib.request import urlopen 
-        #KGB_url='https://raw.githubusercontent.com/dcchivian/KGB/master/KGB.py'
-        #import_code = urlopen(KGB_url)
+        #KBGB_url='https://raw.githubusercontent.com/dcchivian/KBGB/master/KBGB.py'
+        #import_code = urlopen(KBGB_url)
         #%pylab notebook
         #exec(import_code.read())
 
@@ -133,7 +143,7 @@ class kb_genetree:
 
 
         ###############################################################################
-        # KGB user input vars  (Preferably implement as separate upstream cell)
+        # KBGB user input vars  (Preferably implement as separate upstream cell)
         ###############################################################################        
 
         """
@@ -144,7 +154,7 @@ class kb_genetree:
         #            Search Terms: YES                                                                 #
         ################################################################################################
 
-        %pylab notebook  # must occur prior to invoking KGB if running KGB as an exec()
+        %pylab notebook  # must occur prior to invoking KBGB if running KBGB as an exec()
         KBase_backend = False
 
         GenomeSet_names = ["Gsulf", "DvulH", "DdesulfG20", "EcoliK12", "Bsub", "DaudaxMP104C"]
@@ -178,19 +188,19 @@ class kb_genetree:
                         'fucI',
                         'sulfate adenylyl transferase']
 
-        # run KGB
+        # run KBGB
         from urllib.request import urlopen
-        import_code = urlopen('https://raw.githubusercontent.com/dcchivian/KGB/master/KGB.py')
+        import_code = urlopen('https://raw.githubusercontent.com/dcchivian/KBGB/master/KBGB.py')
         exec(import_code.read())
 
         """
 
 
         ###############################################################################
-        # KGB
+        # KBGB
         ###############################################################################
         """
-        ## KGB Genome Browser (KGB)                                                  
+        ## KBGB Genome Browser (KBGB)                                                  
         ##                                                                              
         ##  An IPython/Jupyter Notebook genome browser that enables comparative         
         ##  browsing and searching of genome contig assemblies, with additional         
@@ -200,7 +210,7 @@ class kb_genetree:
         ##  * gene homology                                                             
         ##  * phylogenetic trees                                                        
         ##
-        ## source code available at http://github.com/dcchivian/KGB
+        ## source code available at http://github.com/dcchivian/KBGB
         ##                                                                              
         ## Copyright 2015-2017 Dylan Chivian  
         ##
@@ -678,7 +688,7 @@ class kb_genetree:
             # Need GeneTree_ref, FeatureSet_ref, or GenomeSet_ref
             #
             else:
-                raise ValueError ("KGB: GeneTree_ref, FeatureSet_ref, or GenomeSet_ref is required")
+                raise ValueError ("KBGB: GeneTree_ref, FeatureSet_ref, or GenomeSet_ref is required")
 
 
         # Instantiate GenomeAnnotationAPI and Build GenomeSet_names
@@ -765,7 +775,7 @@ class kb_genetree:
 
         # Init variables / objects
         #
-        tool_title = "KGB Genome Browser"
+        tool_title = "KBGB Genome Browser"
         color_namespace_names_disp = ['Annot', 'EC']
         color_namespace_names = ['annot', 'ec']
         if domain_data_exists == None:
@@ -795,7 +805,10 @@ class kb_genetree:
         #
         num_genomes = len(ContigSet_names)
         def_genome_mode_n_rows = 7
-        max_rows = 100
+        if params is not None and params.get('max_rows'):
+            max_rows = params['max_rows']
+        else:
+            max_rows = 100
         #max_rows = 10  # DEBUG
         if max_rows < def_genome_mode_n_rows:
             max_rows = def_genome_mode_n_rows
@@ -804,9 +817,14 @@ class kb_genetree:
         max_feature_disp_len = 8
             
         def_popup_zorder = 100
-        def_genomebrowser_window_bp_width = 1000
+
+        if params is not None and params.get('slice_width'):
+            def_genomebrowser_window_bp_width = 1000 * params['slice_width']
+            def_genomebrowser_zoom = 0  # zoom values are [0..zoom_tics] -> window width = is def_genomebrowser_window_bp_width * 2**i
+        else:
+            def_genomebrowser_window_bp_width = 1000
+            def_genomebrowser_zoom = 4  # zoom values are [0..zoom_tics] -> window width = is def_genomebrowser_window_bp_width * 2**i
         def_genomebrowser_zoom_tics = 7
-        def_genomebrowser_zoom = 4  # zoom values are [0..zoom_tics] -> window width = is def_genomebrowser_window_bp_width * 2**i
         def_genomebrowser_xshift = 0
         genomebrowser_window_bp_width = def_genomebrowser_window_bp_width * 2**def_genomebrowser_zoom
 
@@ -4975,14 +4993,14 @@ class kb_genetree:
         # Main
         ###############################################################################
 
-        # Instantiate fig_KGB
+        # Instantiate fig_KBGB
         #   
         if not Hide_controls:
             figure_height = top_nav_height + figure_height_scaling*(total_rows+1)
         else:
             figure_height = figure_height_scaling*(total_rows+1)
-        fig_KGB = pyplot.figure(1, (figure_width, figure_height))
-        #fig_KGB.suptitle(tool_title, fontsize=20)
+        fig_KBGB = pyplot.figure(1, (figure_width, figure_height))
+        #fig_KBGB.suptitle(tool_title, fontsize=20)
 
         if not Hide_controls:
             # want to maintain constant top nav height, so adjust proportion according to number of rows
@@ -4999,7 +5017,7 @@ class kb_genetree:
             ax_center     = pyplot.subplot2grid((1000,4), (0,1), rowspan=1000, colspan=3)   
 
         # Let's turn off visibility of all tick labels and boxes here
-        for ax in fig_KGB.axes:
+        for ax in fig_KBGB.axes:
             ax.xaxis.set_visible(False)  # remove axis labels and ticks
             ax.yaxis.set_visible(False)
             for t in ax.get_xticklabels()+ax.get_yticklabels():  # remove tick labels
@@ -5017,7 +5035,7 @@ class kb_genetree:
             ax.spines['left'].set_visible(False) #  Get rid of bottom axis line
             ax.spines['right'].set_visible(False) #  Get rid of bottom axis line
 
-        fig_KGB.tight_layout()  # left justify and space subplots reasonably.  Must follow axis creation
+        fig_KBGB.tight_layout()  # left justify and space subplots reasonably.  Must follow axis creation
 
 
         # Load domain family descriptions
@@ -5053,7 +5071,7 @@ class kb_genetree:
             update_control_panel (ax_top_center)
 
         ###############################################################################
-        # End KGB
+        # End KBGB
         ###############################################################################
 
 
@@ -5068,8 +5086,8 @@ class kb_genetree:
         pdf_file = out_file_basename+'.pdf'
         output_png_file_path = os.path.join(html_dir, png_file);
         output_pdf_file_path = os.path.join(html_dir, pdf_file);
-        fig_KGB.savefig(output_png_file_path, dpi=img_dpi)
-        fig_KGB.savefig(output_pdf_file_path, format='pdf')
+        fig_KBGB.savefig(output_png_file_path, dpi=img_dpi)
+        fig_KBGB.savefig(output_pdf_file_path, format='pdf')
 
 
         # Create HTML

@@ -1,7 +1,7 @@
 #
 # define display information
 #
-name: View Gene Tree Genome Context - v0.0.1
+name: View Gene Tree Genome Context - v0.0.2
 
 tooltip: |
     View the neighborhood around each gene in a gene tree, like a Tree Browser
@@ -29,7 +29,30 @@ parameters :
             Gene Tree
         short-hint : |
             The gene tree around which to view neighborhood
+    genome_disp_name_config :
+        ui-name : |
+            Display genome as
+        short-hint : |
+            Use the object name, object version, and/or scientific name of the Genome in the report
+    slice_width :
+        ui-name : |
+            Genome slice width (Kbp)
+        short-hint : |
+            The kilo basepair width of the genome context slice to view
+    max_rows :
+        ui-name : |
+            Max rows
+        short-hint : |
+            Limit how many rows (leaves) can be shown.  Affects report.
+    prevalence_color_threshold :
+        ui-name : |
+            Prevalence color percent
+        short-hint : |
+            The percentage of the gene annotation in genome members above which to color gene in report
 
+#
+# App desc
+#
 description : |
     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed pulvinar efficitur felis, quis tincidunt sem congue at. Vivamus ornare feugiat faucibus. Fusce tincidunt mattis nunc, nec varius purus convallis quis. Nulla facilisi. In at magna dolor. Suspendisse sit amet felis at arcu auctor dapibus vitae pharetra dui. Nam semper mi quis tortor fermentum mollis. Donec a arcu pharetra, rutrum dolor vitae, rutrum mauris. Donec ornare fringilla sagittis. Nam laoreet est in elementum malesuada. Vestibulum id mi eget urna hendrerit feugiat. Donec et ultrices nulla. Phasellus diam eros, dapibus at tempus nec, semper vel ante.</p>
 

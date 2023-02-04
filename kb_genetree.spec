@@ -33,6 +33,9 @@ module kb_genetree {
         workspace_id    workspace_id;
         data_obj_ref    input_genetree_ref;
         string          genome_disp_name_config;
+	float           slice_width;
+	int             max_rows;
+	float           prevalence_color_threshold;
     } GeneTreeGenomeContext_Input;
 
     funcdef run_genetree_genome_context(GeneTreeGenomeContext_Input params)
