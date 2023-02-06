@@ -1825,7 +1825,7 @@ class kb_genetree:
                                         continue
                                     fid = feature_slice_ids[ctg_id][strand][f_range]
                                     feature_slice_ids_list.extend(fid)
-                                    feature_lens[fid] = f_range_end - f_range_beg + 1
+                                    feature_lens[fid] = int(f_range_end) - int(f_range_beg) + 1
                         if len(feature_slice_ids_list) == 0:
                             Feature_slices.append([Feature_slice[0]])
                             continue  
