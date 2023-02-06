@@ -891,9 +891,10 @@ class kb_genetree:
         if total_rows > max_rows:
             total_rows = max_rows
         #figure_width = 12.0
-        figure_width = 11.0
+        base_figure_width = 11.0
         def_fig_width_in_bp = 16000.0
         figure_width_adjust = 0.5 * (figure_width/def_fig_width_in_bp) * (def_genomebrowser_window_bp_width - def_fig_width_in_bp)
+        figure_width = base_figure_width
         if figure_width_adjust > 0:
             figure_width += figure_width_adjust
         figure_height_scaling = 0.75
@@ -908,7 +909,7 @@ class kb_genetree:
         arrow_w = 0.25/total_rows
         head_w = arrow_w
         #head_l = 0.4*head_w
-        head_l = 0.015
+        head_l = (0.015 / base_figure_width) * figure_width
         base_arrow_label_fontsize = 10
         foi_arrow_label_fontsize = 13
         text_padding = 0.03/total_rows
@@ -4445,7 +4446,7 @@ class kb_genetree:
                 # new 
                 dpi = 600
                 img_units = "in"
-                img_pix_width = 200
+                img_pix_width = int((200.0 / base_figure_width) * figure_width)<
                 img_in_width = round(float(img_pix_width)/float(dpi), 1)
                 img_pix_height = 40 * total_rows
                 #img_pix_height = 10 * total_rows
@@ -5097,7 +5098,7 @@ class kb_genetree:
         # Create HTML
         #
         self.log(console, "SAVING REPORT HTML")
-        img_html_width=1000
+        img_html_width = int((1000.0 / base_figure_width) * figure_width)
         html_file = 'index.html'
         output_html_file_path = os.path.join(html_dir, html_file);
         html_report_lines = []
