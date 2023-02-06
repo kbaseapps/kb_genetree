@@ -892,9 +892,9 @@ class kb_genetree:
             total_rows = max_rows
         #figure_width = 12.0
         base_figure_width = 11.0
+        figure_width = base_figure_width
         def_fig_width_in_bp = 16000.0
         figure_width_adjust = 0.5 * (figure_width/def_fig_width_in_bp) * (def_genomebrowser_window_bp_width - def_fig_width_in_bp)
-        figure_width = base_figure_width
         if figure_width_adjust > 0:
             figure_width += figure_width_adjust
         figure_height_scaling = 0.75
@@ -909,7 +909,8 @@ class kb_genetree:
         arrow_w = 0.25/total_rows
         head_w = arrow_w
         #head_l = 0.4*head_w
-        head_l = (0.015 * base_figure_width) / figure_width
+        head_l = 0.015
+        #head_l = (0.015 * base_figure_width) / figure_width
         base_arrow_label_fontsize = 10
         foi_arrow_label_fontsize = 13
         text_padding = 0.03/total_rows
