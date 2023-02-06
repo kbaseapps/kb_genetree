@@ -1823,9 +1823,10 @@ class kb_genetree:
                                     [f_range_beg,f_range_end] = f_range.split('-')  # SHOULDN'T BE NECESSARY IF get_feature_ids() WORKING
                                     if int(f_range_beg) > slice_end or int(f_range_end) < slice_beg:
                                         continue
-                                    fid = feature_slice_ids[ctg_id][strand][f_range]
-                                    feature_slice_ids_list.extend(fid)
-                                    feature_lens[fid] = int(f_range_end) - int(f_range_beg) + 1
+                                    fids = feature_slice_ids[ctg_id][strand][f_range]
+                                    feature_slice_ids_list.extend(fids)
+                                    for fid in fids:
+                                        feature_lens[fid] = int(f_range_end) - int(f_range_beg) + 1
                         if len(feature_slice_ids_list) == 0:
                             Feature_slices.append([Feature_slice[0]])
                             continue  
