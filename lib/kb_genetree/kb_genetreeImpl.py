@@ -4448,12 +4448,13 @@ class kb_genetree:
                 dpi = 600
                 img_units = "in"
                 base_img_pix_width = 200
-                img_pix_width = int((figure_width / base_figure_width) * base_img_pix_width)
+                img_pix_width = base_img_pix_width
+                #img_pix_width = int((figure_width / base_figure_width) * base_img_pix_width)
                 img_in_width = round(float(img_pix_width)/float(dpi), 1)
-                #img_pix_height = 40 * total_rows
+                #base_row_scaling = 10
                 base_row_scaling = 40
-                img_pix_height = int(base_row_scaling * total_rows * (figure_width / base_figure_width))
-                #img_pix_height = 10 * total_rows
+                img_pix_height = base_row_scaling * total_rows
+                #img_pix_height = int(base_row_scaling * total_rows * (figure_width / base_figure_width))
                 img_in_height = round(float(img_pix_height)/float(dpi), 1)
                 self.log(console,"SAVING TREE IMAGE")  # DEBUG
                 treeObj.render(tree_img_path, w=img_in_width, h=img_in_height, units=img_units, dpi=dpi, tree_style=ts)
@@ -5102,8 +5103,9 @@ class kb_genetree:
         # Create HTML
         #
         self.log(console, "SAVING REPORT HTML")
-        #img_html_width = 1000.0
-        img_html_width = int((figure_width / base_figure_width) * 1000.0)
+        base_img_html_width = 1000
+        img_html_width = base_img_html_width
+        #img_html_width = int((figure_width / base_figure_width) * base_img_html_width)
         html_file = 'index.html'
         output_html_file_path = os.path.join(html_dir, html_file);
         html_report_lines = []
