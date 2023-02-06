@@ -909,7 +909,7 @@ class kb_genetree:
         arrow_w = 0.25/total_rows
         head_w = arrow_w
         #head_l = 0.4*head_w
-        head_l = (0.015 / base_figure_width) * figure_width
+        head_l = (0.015 * base_figure_width) / figure_width
         base_arrow_label_fontsize = 10
         foi_arrow_label_fontsize = 13
         text_padding = 0.03/total_rows
@@ -4446,7 +4446,7 @@ class kb_genetree:
                 # new 
                 dpi = 600
                 img_units = "in"
-                img_pix_width = int((200.0 / base_figure_width) * figure_width)<
+                img_pix_width = int((200.0 / base_figure_width) * figure_width)
                 img_in_width = round(float(img_pix_width)/float(dpi), 1)
                 img_pix_height = 40 * total_rows
                 #img_pix_height = 10 * total_rows
