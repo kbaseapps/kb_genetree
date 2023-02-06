@@ -1807,6 +1807,7 @@ class kb_genetree:
                             slice_beg = 1
                         features = []
                         feature_slice_ids_list = []
+                        feature_lens = dict()
         # RESTORE
         #                feature_slice_ids = ga.get_feature_ids(group_by='region', filters={ "region_list": [{'contig_id':scaffold_id, 'strand':'?', 'start':slice_beg, 'length':slice_end-slice_beg+1}]})
                         #feature_slice_ids = ga.get_feature_ids(group_by='region')
@@ -1822,10 +1823,19 @@ class kb_genetree:
                                     [f_range_beg,f_range_end] = f_range.split('-')  # SHOULDN'T BE NECESSARY IF get_feature_ids() WORKING
                                     if int(f_range_beg) > slice_end or int(f_range_end) < slice_beg:
                                         continue
-                                    feature_slice_ids_list.extend(feature_slice_ids[ctg_id][strand][f_range])
+                                    fid = feature_slice_ids[ctg_id][strand][f_range]
+                                    feature_slice_ids_list.extend(fid)
+                                    feature_lens[fid] = f_range_end - f_range_beg + 1
                         if len(feature_slice_ids_list) == 0:
                             Feature_slices.append([Feature_slice[0]])
                             continue  
+                        
+                        # resort features so that longest are first and get painted over by shorter overlapping features
+                        new_features_slice_ids = []
+                        for feature_item in sorted(feature_lens.items(), key=lambda x:x[1], reverse=True):
+                            new_features_slice_ids.append(feature_item[0])
+                        feature_slice_ids_list = new_features_slice_ids
+
                         #features = ga.get_features(feature_id_list=feature_slice_ids_list)
                         features = gaAPI_get_features(genome_obj=genome_obj, feature_id_list=feature_slice_ids_list)
 
